@@ -278,7 +278,7 @@
             white-space: pre-wrap;
             line-height: 1.4;
             min-width: 120px;
-            max-width: 300px;
+            max-width: 500px;
         }
 
         .data-table tr:hover td {
@@ -308,7 +308,9 @@
             text-align: right;
             font-weight: 600;
             color: #dc2626;
-            min-width: 100px;
+            min-width: 120px;
+            word-break: break-word;
+            white-space: pre-wrap;
         }
 
         .project-id {
@@ -341,22 +343,28 @@
             word-break: break-word;
         }
 
+        .email-subject {
+            min-width: 250px;
+            max-width: 400px;
+            font-style: italic;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
         .project-title {
-            min-width: 180px;
-            max-width: 250px;
+            min-width: 250px;
+            max-width: 400px;
             font-weight: 600;
+            word-break: break-word;
+            white-space: pre-wrap;
         }
 
         .project-description {
-            min-width: 200px;
-            max-width: 300px;
+            min-width: 300px;
+            max-width: 500px;
             line-height: 1.5;
-        }
-
-        .email-subject {
-            min-width: 180px;
-            max-width: 250px;
-            font-style: italic;
+            word-break: break-word;
+            white-space: pre-wrap;
         }
 
         .refresh-btn {
@@ -638,10 +646,10 @@
             switch (columnIndex) {
                 case 0: // Processed At
                     const processed = cellValue.toLowerCase();
-                    if (processed.includes('已') || processed.includes('yes') || processed.includes('completed')) {
+                    if (processed.includes('已') || processed.includes('yes') || processed.includes('completed') || processed.includes('true') || processed === '1') {
                         return `<span class="processed-status processed-yes">✅ ${cellValue}</span>`;
                     } else {
-                        return `<span class="processed-status processed-no">❌ ${cellValue}</span>`;
+                        return `<span class="processed-status processed-no">⏳ ${cellValue}</span>`;
                     }
                 
                 case 1: // Email Timestamp
@@ -661,10 +669,7 @@
                     return `<span class="project-description">${cellValue}</span>`;
                 
                 case 6: // Work Rate
-                    const rate = parseFloat(cellValue);
-                    if (!isNaN(rate)) {
-                        return `<span class="work-rate">¥${rate.toFixed(2)}</span>`;
-                    }
+                    // 保持原始显示，不进行数字解析
                     return `<span class="work-rate">${cellValue}</span>`;
                 
                 case 8: // Contact Person
