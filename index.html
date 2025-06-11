@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 2170px; /* 1400px * 1.55 = 2170px */
+            max-width: 2170px;
             width: 95%;
             margin: 0 auto;
             background: #ffffff;
@@ -42,6 +42,51 @@
             font-weight: 300;
         }
 
+        /* Tab Navigation Styles */
+        .tab-navigation {
+            background: #f8f9fa;
+            border-bottom: 3px solid #dc2626;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: #e5e7eb;
+            color: #374151;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-right: 1px solid #d1d5db;
+            min-width: 200px;
+        }
+
+        .tab-button:last-child {
+            border-right: none;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(45deg, #dc2626, #991b1b);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+
+        .tab-button:hover:not(.active) {
+            background: #d1d5db;
+            color: #1f2937;
+        }
+
+        .tab-button:disabled {
+            background: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Config Section */
         .config-section {
             background: #fffbeb;
             padding: 25px;
@@ -106,8 +151,14 @@
             transform: none;
         }
 
-        .content {
+        /* Tab Content */
+        .tab-content {
+            display: none;
             padding: 25px;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .loading {
@@ -289,7 +340,7 @@
             background-color: #fffbeb;
         }
 
-        /* 特定列的样式 */
+        /* Specific column styles */
         .processed-status {
             text-align: center;
             font-weight: bold;
@@ -408,6 +459,67 @@
             background: #d97706;
         }
 
+        /* Talent database specific styles */
+        .talent-id {
+            font-family: 'Courier New', monospace;
+            background: #e0f2fe;
+            color: #0277bd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .skill-tag {
+            background: #e1f5fe;
+            color: #01579b;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .experience-years {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        /* Matching results specific styles */
+        .match-score {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .match-score.high {
+            background: #c8e6c9;
+            color: #1b5e20;
+        }
+
+        .match-score.medium {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .match-score.low {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .match-details {
+            max-width: 300px;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -421,6 +533,12 @@
 
             .header h1 {
                 font-size: 1.8em;
+            }
+
+            .tab-button {
+                min-width: 150px;
+                font-size: 14px;
+                padding: 12px 15px;
             }
 
             .config-form {
@@ -453,279 +571,677 @@
             <p>项目进度追踪与工作记录管理系统</p>
         </div>
 
-        <div class="config-section">
+        <!-- Configuration Section -->
+        <div class="config-section" id="configSection">
             <div class="config-form">
                 <div class="form-group">
                     <label for="apiKey">Google API 密钥:</label>
                     <input type="text" id="apiKey" placeholder="输入您的Google Sheets API密钥">
                 </div>
                 <div class="form-group">
-                    <label for="sheetId">表格ID:</label>
-                    <input type="text" id="sheetId" placeholder="从Google Sheets URL中复制表格ID">
+                    <label for="sheetId">Google Sheets表格ID:</label>
+                    <input type="text" id="sheetId" placeholder="包含所有数据的Google Sheets表格ID">
                 </div>
-                <div class="form-group">
-                    <label for="sheetRange">数据范围:</label>
-                    <input type="text" id="sheetRange" value="Sheet1!A1:J1000" placeholder="例如: Sheet1!A1:J1000">
-                </div>
-                <button class="load-btn" onclick="loadData()">🔄 加载项目数据</button>
+                <button class="load-btn" onclick="authenticateAndLoad()">🔄 认证并加载数据</button>
             </div>
         </div>
 
-        <div class="content">
-            <div id="loading" class="loading" style="display: none;">
+        <!-- Tab Navigation -->
+        <div class="tab-navigation" id="tabNavigation" style="display: none;">
+            <button class="tab-button active" onclick="switchTab('case')" id="caseTab">📋 案件数据库</button>
+            <button class="tab-button" onclick="switchTab('talent')" id="talentTab">👥 人才数据库</button>
+            <button class="tab-button" onclick="switchTab('matching')" id="matchingTab">🎯 匹配结果一览</button>
+        </div>
+
+        <!-- Case Database Tab -->
+        <div class="tab-content active" id="caseContent">
+            <div id="caseLoading" class="loading" style="display: none;">
                 <div class="spinner"></div>
-                <p>正在加载项目数据...</p>
+                <p>正在加载案件数据...</p>
             </div>
 
-            <div id="error" class="error" style="display: none;"></div>
+            <div id="caseError" class="error" style="display: none;"></div>
 
-            <div id="stats" class="stats" style="display: none;"></div>
+            <div id="caseStats" class="stats" style="display: none;"></div>
 
-            <div id="dataContainer" style="display: none;">
-                <div id="filters" class="filters">
+            <div id="caseDataContainer" style="display: none;">
+                <div id="caseFilters" class="filters">
                     <div class="filter-group">
-                        <label for="processedFilter">处理状态:</label>
-                        <select id="processedFilter">
+                        <label for="caseProcessedFilter">处理状态:</label>
+                        <select id="caseProcessedFilter">
                             <option value="">全部</option>
                             <option value="已处理">已处理</option>
                             <option value="未处理">未处理</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label for="projectFilter">项目ID:</label>
-                        <input type="text" id="projectFilter" placeholder="搜索项目ID...">
+                        <label for="caseProjectFilter">项目ID:</label>
+                        <input type="text" id="caseProjectFilter" placeholder="搜索项目ID...">
                     </div>
                     <div class="filter-group">
-                        <label for="contactFilter">联系人:</label>
-                        <input type="text" id="contactFilter" placeholder="搜索联系人...">
+                        <label for="caseContactFilter">联系人:</label>
+                        <input type="text" id="caseContactFilter" placeholder="搜索联系人...">
                     </div>
                     <div class="filter-group">
-                        <label for="dateFilter">日期范围:</label>
-                        <input type="date" id="dateFilter">
+                        <label for="caseDateFilter">日期范围:</label>
+                        <input type="date" id="caseDateFilter">
                     </div>
                     <div class="filter-group">
-                        <button class="filter-btn" onclick="applyFilters()">🔍 筛选</button>
+                        <button class="filter-btn" onclick="applyFilters('case')">🔍 筛选</button>
                     </div>
                     <div class="filter-group">
-                        <button class="clear-btn" onclick="clearFilters()">🔄 清除</button>
+                        <button class="clear-btn" onclick="clearFilters('case')">🔄 清除</button>
                     </div>
                 </div>
 
                 <div class="toolbar">
-                    <h3>📈 项目数据表格</h3>
+                    <h3>📈 案件数据表格</h3>
                     <div>
-                        <button class="export-btn" onclick="exportToCSV()">📥 导出CSV</button>
-                        <button class="refresh-btn" onclick="loadData()">🔄 刷新数据</button>
+                        <button class="export-btn" onclick="exportToCSV('case')">📥 导出CSV</button>
+                        <button class="refresh-btn" onclick="loadData('case')">🔄 刷新数据</button>
                     </div>
                 </div>
 
                 <div class="table-container">
-                    <table class="data-table" id="dataTable"></table>
+                    <table class="data-table" id="caseDataTable"></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Talent Database Tab -->
+        <div class="tab-content" id="talentContent">
+            <div id="talentLoading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>正在加载人才数据...</p>
+            </div>
+
+            <div id="talentError" class="error" style="display: none;"></div>
+
+            <div id="talentStats" class="stats" style="display: none;"></div>
+
+            <div id="talentDataContainer" style="display: none;">
+                <div id="talentFilters" class="filters">
+                    <div class="filter-group">
+                        <label for="talentSkillFilter">技术技能:</label>
+                        <input type="text" id="talentSkillFilter" placeholder="搜索技能...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="talentLocationFilter">工作地点:</label>
+                        <input type="text" id="talentLocationFilter" placeholder="搜索地点...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="talentExperienceFilter">经验年限:</label>
+                        <select id="talentExperienceFilter">
+                            <option value="">全部</option>
+                            <option value="0-2">0-2年</option>
+                            <option value="3-5">3-5年</option>
+                            <option value="6-10">6-10年</option>
+                            <option value="10+">10年以上</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="talentNameFilter">姓名:</label>
+                        <input type="text" id="talentNameFilter" placeholder="搜索姓名...">
+                    </div>
+                    <div class="filter-group">
+                        <button class="filter-btn" onclick="applyFilters('talent')">🔍 筛选</button>
+                    </div>
+                    <div class="filter-group">
+                        <button class="clear-btn" onclick="clearFilters('talent')">🔄 清除</button>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <h3>👥 人才数据表格</h3>
+                    <div>
+                        <button class="export-btn" onclick="exportToCSV('talent')">📥 导出CSV</button>
+                        <button class="refresh-btn" onclick="loadData('talent')">🔄 刷新数据</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="talentDataTable"></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matching Results Tab -->
+        <div class="tab-content" id="matchingContent">
+            <div id="matchingLoading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>正在加载匹配结果...</p>
+            </div>
+
+            <div id="matchingError" class="error" style="display: none;"></div>
+
+            <div id="matchingStats" class="stats" style="display: none;"></div>
+
+            <div id="matchingDataContainer" style="display: none;">
+                <div id="matchingFilters" class="filters">
+                    <div class="filter-group">
+                        <label for="matchingTalentFilter">人才ID:</label>
+                        <input type="text" id="matchingTalentFilter" placeholder="搜索人才ID...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="matchingQueryFilter">查询ID:</label>
+                        <input type="text" id="matchingQueryFilter" placeholder="搜索查询ID...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="matchingScoreFilter">最低匹配分数:</label>
+                        <input type="number" id="matchingScoreFilter" placeholder="例如: 80" min="0" max="100">
+                    </div>
+                    <div class="filter-group">
+                        <label for="matchingDateFilter">匹配日期:</label>
+                        <input type="date" id="matchingDateFilter">
+                    </div>
+                    <div class="filter-group">
+                        <button class="filter-btn" onclick="applyFilters('matching')">🔍 筛选</button>
+                    </div>
+                    <div class="filter-group">
+                        <button class="clear-btn" onclick="clearFilters('matching')">🔄 清除</button>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <h3>🎯 匹配结果表格</h3>
+                    <div>
+                        <button class="export-btn" onclick="exportToCSV('matching')">📥 导出CSV</button>
+                        <button class="refresh-btn" onclick="loadData('matching')">🔄 刷新数据</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="matchingDataTable"></table>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let currentData = [];
-        let filteredData = [];
+        let currentData = {
+            case: [],
+            talent: [],
+            matching: []
+        };
+        let filteredData = {
+            case: [],
+            talent: [],
+            matching: []
+        };
+        let isAuthenticated = false;
         
-        // 预定义的列映射
-        const columnMapping = {
-            'Processed At': 0,
-            'Email Timestamp': 1,
-            'Email Subject': 2,
-            'Project ID': 3,
-            'Project Title': 4,
-            'Project Description': 5,
-            'Work Rate': 6,
-            'Start Time': 7,
-            'Contact Person': 8,
-            'Contact Information': 9
+        // Column mappings for different tabs
+        const columnMappings = {
+            case: {
+                'Processed At': 0,
+                'Email Timestamp': 1,
+                'Email Subject': 2,
+                'Project ID': 3,
+                'Project Title': 4,
+                'Project Description': 5,
+                'Work Rate': 6,
+                'Start Time': 7,
+                'Contact Person': 8,
+                'Contact Information': 9
+            },
+            talent: {
+                '分析日期': 0,
+                'PDF 文件名': 1,
+                'Resume ID': 2,
+                '全名': 3,
+                '职业头衔': 4,
+                '工作经验年限': 5,
+                '技术技能': 6,
+                '证书': 7,
+                '教育背景': 8,
+                '先前雇主': 9,
+                '主要项目': 10,
+                '首选工作地点': 11,
+                '语言能力': 12,
+                '联系邮箱': 13,
+                'LinkedIn 或个人网站': 14
+            },
+            matching: {
+                'Match_Date': 0,
+                'Talent_ID': 1,
+                'Talent_Name': 2,
+                'Query_ID': 3,
+                'Match 1 ID': 4,
+                'Match 1 Score': 5,
+                'Match 1 Name': 6,
+                'Match 2 ID': 7,
+                'Match 2 Score': 8,
+                'Match 2 Name': 9,
+                'Match 3 ID': 10,
+                'Match 3 Score': 11,
+                'Match 3 Name': 12,
+                'Match Details': 13
+            }
         };
 
-        // 从localStorage加载保存的配置
+        // Predefined headers for each tab
+        const predefinedHeaders = {
+            case: [
+                'Processed At', 'Email Timestamp', 'Email Subject', 'Project ID',
+                'Project Title', 'Project Description', 'Work Rate', 'Start Time',
+                'Contact Person', 'Contact Information'
+            ],
+            talent: [
+                '分析日期', 'PDF 文件名', 'Resume ID', '全名', '职业头衔',
+                '工作经验年限', '技术技能', '证书', '教育背景', '先前雇主',
+                '主要项目', '首选工作地点', '语言能力', '联系邮箱', 'LinkedIn 或个人网站'
+            ],
+            matching: [
+                'Match_Date', 'Talent_ID', 'Talent_Name', 'Query_ID',
+                'Match 1 ID', 'Match 1 Score', 'Match 1 Name',
+                'Match 2 ID', 'Match 2 Score', 'Match 2 Name',
+                'Match 3 ID', 'Match 3 Score', 'Match 3 Name', 'Match Details'
+            ]
+        };
+
+        // Sheet names configuration
+        const sheetNames = {
+            case: 'projects',
+            talent: 'resume_database',
+            matching: 'matches'
+        };
+
+        // Load configuration from localStorage
         function loadConfig() {
             const apiKey = localStorage.getItem('projectMgmtApiKey');
             const sheetId = localStorage.getItem('projectMgmtSheetId');
-            const sheetRange = localStorage.getItem('projectMgmtSheetRange');
 
             if (apiKey) document.getElementById('apiKey').value = apiKey;
             if (sheetId) document.getElementById('sheetId').value = sheetId;
-            if (sheetRange) document.getElementById('sheetRange').value = sheetRange;
         }
 
-        // 保存配置到localStorage
+        // Save configuration to localStorage
         function saveConfig() {
             localStorage.setItem('projectMgmtApiKey', document.getElementById('apiKey').value);
             localStorage.setItem('projectMgmtSheetId', document.getElementById('sheetId').value);
-            localStorage.setItem('projectMgmtSheetRange', document.getElementById('sheetRange').value);
         }
 
-        // 显示错误信息
-        function showError(message) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.innerHTML = `<strong>错误:</strong> ${message}`;
-            errorDiv.style.display = 'block';
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('dataContainer').style.display = 'none';
-            document.getElementById('stats').style.display = 'none';
-        }
-
-        // 隐藏错误信息
-        function hideError() {
-            document.getElementById('error').style.display = 'none';
-        }
-
-        // 显示加载状态
-        function showLoading() {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('dataContainer').style.display = 'none';
-            document.getElementById('stats').style.display = 'none';
-            hideError();
-        }
-
-        // 生成统计信息
-        function generateStats(data) {
-            const statsContainer = document.getElementById('stats');
-            
-            // 检测数据是否包含表头行
-            const hasHeader = data[0] && data[0].join('').toLowerCase().includes('processed');
-            const startIndex = hasHeader ? 1 : 0;
-            const totalProjects = data.length - startIndex; // 减去header行（如果有的话）
-            
-            // 计算已处理项目数
-            let processedCount = 0;
-            let totalWorkRate = 0;
-            let validRates = 0;
-            
-            for (let i = startIndex; i < data.length; i++) {
-                const processedStatus = data[i][0] || '';
-                if (processedStatus.includes('已') || processedStatus.toLowerCase().includes('yes') || processedStatus.toLowerCase().includes('completed')) {
-                    processedCount++;
+        // Auto-detect data range for a sheet
+        async function detectSheetRange(apiKey, sheetId, sheetName) {
+            try {
+                // First, get basic sheet info to determine dimensions
+                const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${apiKey}`;
+                const metadataResponse = await fetch(metadataUrl);
+                
+                if (!metadataResponse.ok) {
+                    throw new Error(`无法获取表格信息: ${metadataResponse.status}`);
                 }
                 
-                const workRate = parseFloat(data[i][6]) || 0;
-                if (workRate > 0) {
-                    totalWorkRate += workRate;
-                    validRates++;
+                const metadata = await metadataResponse.json();
+                const sheet = metadata.sheets.find(s => s.properties.title === sheetName);
+                
+                if (!sheet) {
+                    throw new Error(`未找到名为 "${sheetName}" 的工作表`);
                 }
+                
+                const gridProperties = sheet.properties.gridProperties;
+                const maxRows = Math.min(gridProperties.rowCount || 1000, 1000);
+                const maxCols = Math.min(gridProperties.columnCount || 26, 26);
+                
+                // Convert column number to letter (A, B, C, ... Z)
+                const getColumnLetter = (colNum) => {
+                    return String.fromCharCode(65 + colNum - 1);
+                };
+                
+                const endColumn = getColumnLetter(maxCols);
+                const range = `${sheetName}!A1:${endColumn}${maxRows}`;
+                
+                console.log(`检测到的数据范围: ${range}`);
+                return range;
+                
+            } catch (error) {
+                console.error(`检测工作表范围时出错:`, error);
+                // Fallback to default range
+                return `${sheetName}!A1:Z1000`;
+            }
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            if (!isAuthenticated) return;
+
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + 'Content').classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Load data if not already loaded
+            if (currentData[tabName].length === 0) {
+                loadData(tabName);
+            }
+        }
+
+        // Authenticate and load initial data
+        async function authenticateAndLoad() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const sheetId = document.getElementById('sheetId').value.trim();
+
+            if (!apiKey || !sheetId) {
+                showError('case', '请输入Google API密钥和表格ID');
+                return;
+            }
+
+            saveConfig();
+            
+            try {
+                // Test authentication with case database first
+                console.log('正在验证认证信息...');
+                showLoading('case');
+                
+                // Detect range and load case data
+                const caseRange = await detectSheetRange(apiKey, sheetId, sheetNames.case);
+                await loadDataWithRange('case', apiKey, sheetId, caseRange);
+                
+                // If successful, show tabs and hide config
+                isAuthenticated = true;
+                document.getElementById('configSection').style.display = 'none';
+                document.getElementById('tabNavigation').style.display = 'flex';
+                
+                console.log('认证成功，已启用所有标签页');
+                
+            } catch (error) {
+                console.error('认证失败:', error);
+                showError('case', '认证失败: ' + error.message);
+            }
+        }
+
+        // Show error message
+        function showError(tabName, message) {
+            const errorDiv = document.getElementById(tabName + 'Error');
+            errorDiv.innerHTML = `<strong>错误:</strong> ${message}`;
+            errorDiv.style.display = 'block';
+            document.getElementById(tabName + 'Loading').style.display = 'none';
+            document.getElementById(tabName + 'DataContainer').style.display = 'none';
+            document.getElementById(tabName + 'Stats').style.display = 'none';
+        }
+
+        // Hide error message
+        function hideError(tabName) {
+            document.getElementById(tabName + 'Error').style.display = 'none';
+        }
+
+        // Show loading state
+        function showLoading(tabName) {
+            document.getElementById(tabName + 'Loading').style.display = 'block';
+            document.getElementById(tabName + 'DataContainer').style.display = 'none';
+            document.getElementById(tabName + 'Stats').style.display = 'none';
+            hideError(tabName);
+        }
+
+        // Generate statistics for different tabs
+        function generateStats(tabName, data) {
+            const statsContainer = document.getElementById(tabName + 'Stats');
+            
+            if (!data || data.length === 0) {
+                statsContainer.style.display = 'none';
+                return;
             }
             
-            const avgWorkRate = validRates > 0 ? (totalWorkRate / validRates).toFixed(2) : 0;
-            const completionRate = totalProjects > 0 ? ((processedCount / totalProjects) * 100).toFixed(1) : 0;
+            const hasHeader = data[0] && (
+                data[0].join('').toLowerCase().includes('processed') ||
+                data[0].join('').toLowerCase().includes('resume') ||
+                data[0].join('').toLowerCase().includes('match')
+            );
+            const startIndex = hasHeader ? 1 : 0;
+            const totalItems = data.length - startIndex;
+            
+            let statsHTML = '';
+            
+            if (tabName === 'case') {
+                let processedCount = 0;
+                let totalWorkRate = 0;
+                let validRates = 0;
+                
+                for (let i = startIndex; i < data.length; i++) {
+                    const processedStatus = data[i][0] || '';
+                    if (processedStatus.includes('已') || processedStatus.toLowerCase().includes('yes')) {
+                        processedCount++;
+                    }
+                    
+                    const workRate = parseFloat(data[i][6]) || 0;
+                    if (workRate > 0) {
+                        totalWorkRate += workRate;
+                        validRates++;
+                    }
+                }
+                
+                const avgWorkRate = validRates > 0 ? (totalWorkRate / validRates).toFixed(2) : 0;
+                const completionRate = totalItems > 0 ? ((processedCount / totalItems) * 100).toFixed(1) : 0;
 
-            statsContainer.innerHTML = `
-                <div class="stat-card">
-                    <div class="number">${totalProjects}</div>
-                    <div class="label">总项目数</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">${processedCount}</div>
-                    <div class="label">已处理项目</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">${completionRate}%</div>
-                    <div class="label">完成率</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">¥${avgWorkRate}</div>
-                    <div class="label">平均工作费率</div>
-                </div>
-            `;
+                statsHTML = `
+                    <div class="stat-card">
+                        <div class="number">${totalItems}</div>
+                        <div class="label">总项目数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${processedCount}</div>
+                        <div class="label">已处理项目</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${completionRate}%</div>
+                        <div class="label">完成率</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">¥${avgWorkRate}</div>
+                        <div class="label">平均工作费率</div>
+                    </div>
+                `;
+            } else if (tabName === 'talent') {
+                let expCounts = { '0-2': 0, '3-5': 0, '6-10': 0, '10+': 0 };
+                let skillSet = new Set();
+                
+                for (let i = startIndex; i < data.length; i++) {
+                    const experience = data[i][5] || '';
+                    const skills = data[i][6] || '';
+                    
+                    const expNum = parseInt(experience) || 0;
+                    if (expNum <= 2) expCounts['0-2']++;
+                    else if (expNum <= 5) expCounts['3-5']++;
+                    else if (expNum <= 10) expCounts['6-10']++;
+                    else expCounts['10+']++;
+                    
+                    if (skills) {
+                        skills.split(/[,，、]/).forEach(skill => {
+                            skillSet.add(skill.trim());
+                        });
+                    }
+                }
+
+                statsHTML = `
+                    <div class="stat-card">
+                        <div class="number">${totalItems}</div>
+                        <div class="label">总人才数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${skillSet.size}</div>
+                        <div class="label">技能种类</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${expCounts['10+']}</div>
+                        <div class="label">资深人才 (10+年)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${expCounts['0-2']}</div>
+                        <div class="label">新手人才 (0-2年)</div>
+                    </div>
+                `;
+            } else if (tabName === 'matching') {
+                let highMatches = 0;
+                let mediumMatches = 0;
+                let lowMatches = 0;
+                let totalScore = 0;
+                let validScores = 0;
+                
+                for (let i = startIndex; i < data.length; i++) {
+                    const score1 = parseFloat(data[i][5]) || 0;
+                    const score2 = parseFloat(data[i][8]) || 0;
+                    const score3 = parseFloat(data[i][11]) || 0;
+                    
+                    [score1, score2, score3].forEach(score => {
+                        if (score > 0) {
+                            totalScore += score;
+                            validScores++;
+                            if (score >= 80) highMatches++;
+                            else if (score >= 60) mediumMatches++;
+                            else lowMatches++;
+                        }
+                    });
+                }
+                
+                const avgScore = validScores > 0 ? (totalScore / validScores).toFixed(1) : 0;
+
+                statsHTML = `
+                    <div class="stat-card">
+                        <div class="number">${totalItems}</div>
+                        <div class="label">总匹配记录</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${highMatches}</div>
+                        <div class="label">高分匹配 (≥80)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${mediumMatches}</div>
+                        <div class="label">中等匹配 (60-79)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${avgScore}</div>
+                        <div class="label">平均匹配分数</div>
+                    </div>
+                `;
+            }
+            
+            statsContainer.innerHTML = statsHTML;
             statsContainer.style.display = 'grid';
         }
 
-        // 格式化单元格内容
-        function formatCellContent(value, columnIndex) {
+        // Format cell content based on tab and column
+        function formatCellContent(value, columnIndex, tabName) {
             if (!value) return '';
             
-            // 确保内容为字符串并处理换行符
             const cellValue = value.toString();
             
-            switch (columnIndex) {
-                case 0: // Processed At
-                    const processed = cellValue.toLowerCase();
-                    if (processed.includes('已') || processed.includes('yes') || processed.includes('completed') || processed.includes('true') || processed === '1') {
-                        return `<span class="processed-status processed-yes">✅ ${cellValue}</span>`;
-                    } else {
-                        return `<span class="processed-status processed-no">⏳ ${cellValue}</span>`;
-                    }
-                
-                case 1: // Email Timestamp
-                case 7: // Start Time
-                    return `<span class="timestamp">${cellValue}</span>`;
-                
-                case 2: // Email Subject
-                    return `<span class="email-subject">${cellValue}</span>`;
-                
-                case 3: // Project ID
-                    return `<span class="project-id">${cellValue}</span>`;
-                
-                case 4: // Project Title
-                    return `<span class="project-title">${cellValue}</span>`;
-                
-                case 5: // Project Description
-                    return `<span class="project-description">${cellValue}</span>`;
-                
-                case 6: // Work Rate
-                    // 保持原始显示，不进行数字解析
-                    return `<span class="work-rate">${cellValue}</span>`;
-                
-                case 8: // Contact Person
-                    return `<span class="contact-info">${cellValue}</span>`;
-                
-                case 9: // Contact Information
-                    return `<span class="contact-info">${cellValue}</span>`;
-                
-                default:
-                    return cellValue;
+            if (tabName === 'case') {
+                switch (columnIndex) {
+                    case 0: // Processed At
+                        const processed = cellValue.toLowerCase();
+                        if (processed.includes('已') || processed.includes('yes')) {
+                            return `<span class="processed-status processed-yes">✅ ${cellValue}</span>`;
+                        } else {
+                            return `<span class="processed-status processed-no">⏳ ${cellValue}</span>`;
+                        }
+                    case 1:
+                    case 7: // Timestamps
+                        return `<span class="timestamp">${cellValue}</span>`;
+                    case 2: // Email Subject
+                        return `<span class="email-subject">${cellValue}</span>`;
+                    case 3: // Project ID
+                        return `<span class="project-id">${cellValue}</span>`;
+                    case 4: // Project Title
+                        return `<span class="project-title">${cellValue}</span>`;
+                    case 5: // Project Description
+                        return `<span class="project-description">${cellValue}</span>`;
+                    case 6: // Work Rate
+                        return `<span class="work-rate">${cellValue}</span>`;
+                    case 8:
+                    case 9: // Contact info
+                        return `<span class="contact-info">${cellValue}</span>`;
+                }
+            } else if (tabName === 'talent') {
+                switch (columnIndex) {
+                    case 0: // Analysis Date
+                        return `<span class="timestamp">${cellValue}</span>`;
+                    case 2: // Resume ID
+                        return `<span class="talent-id">${cellValue}</span>`;
+                    case 3: // Full Name
+                        return `<span class="project-title">${cellValue}</span>`;
+                    case 5: // Experience Years
+                        return `<span class="experience-years">${cellValue}年</span>`;
+                    case 6: // Skills
+                        const skills = cellValue.split(/[,，、]/).slice(0, 5);
+                        return `<div class="skill-tags">${skills.map(skill => 
+                            `<span class="skill-tag">${skill.trim()}</span>`
+                        ).join('')}</div>`;
+                    case 13: // Email
+                        return `<span class="email-cell">${cellValue}</span>`;
+                    case 14: // LinkedIn
+                        if (cellValue.startsWith('http')) {
+                            return `<a href="${cellValue}" target="_blank">${cellValue}</a>`;
+                        }
+                        return cellValue;
+                }
+            } else if (tabName === 'matching') {
+                switch (columnIndex) {
+                    case 0: // Match Date
+                        return `<span class="timestamp">${cellValue}</span>`;
+                    case 1: // Talent ID
+                        return `<span class="talent-id">${cellValue}</span>`;
+                    case 4:
+                    case 7:
+                    case 10: // Match IDs
+                        return `<span class="project-id">${cellValue}</span>`;
+                    case 5:
+                    case 8:
+                    case 11: // Match Scores
+                        const score = parseFloat(cellValue) || 0;
+                        let scoreClass = 'low';
+                        if (score >= 80) scoreClass = 'high';
+                        else if (score >= 60) scoreClass = 'medium';
+                        return `<span class="match-score ${scoreClass}">${cellValue}</span>`;
+                    case 13: // Match Details
+                        return `<span class="match-details">${cellValue}</span>`;
+                }
             }
+            
+            return cellValue;
         }
 
-        // 预定义的表头
-        const predefinedHeaders = [
-            'Processed At',
-            'Email Timestamp', 
-            'Email Subject',
-            'Project ID',
-            'Project Title',
-            'Project Description',
-            'Work Rate',
-            'Start Time',
-            'Contact Person',
-            'Contact Information'
-        ];
-
-        // 渲染数据表格
-        function renderTable(data) {
-            const table = document.getElementById('dataTable');
+        // Render table for specific tab
+        function renderTable(tabName, data) {
+            const table = document.getElementById(tabName + 'DataTable');
             
             if (!data || data.length === 0) {
-                table.innerHTML = '<tr><td colspan="10">没有找到数据</td></tr>';
+                table.innerHTML = '<tr><td colspan="15">没有找到数据</td></tr>';
                 return;
             }
 
             let html = '';
             
-            // 使用预定义的表头
+            // Use predefined headers
             html += '<thead><tr>';
-            predefinedHeaders.forEach((header) => {
+            predefinedHeaders[tabName].forEach((header) => {
                 html += `<th>${header}</th>`;
             });
             html += '</tr></thead>';
 
-            // 创建表体，从第0行开始（因为我们使用预定义表头）
+            // Create table body
             html += '<tbody>';
-            const startIndex = data[0] && data[0].join('').toLowerCase().includes('processed') ? 1 : 0;
+            const startIndex = data[0] && (
+                data[0].join('').toLowerCase().includes('processed') ||
+                data[0].join('').toLowerCase().includes('resume') ||
+                data[0].join('').toLowerCase().includes('match')
+            ) ? 1 : 0;
             
             for (let i = startIndex; i < data.length; i++) {
                 if (data[i] && data[i].some(cell => cell !== undefined && cell !== '')) {
                     html += '<tr>';
-                    const maxCols = Math.min(predefinedHeaders.length, 10); // 确保不超过10列
+                    const maxCols = predefinedHeaders[tabName].length;
                     for (let j = 0; j < maxCols; j++) {
                         const cellValue = data[i][j] || '';
-                        const formattedValue = formatCellContent(cellValue, j);
+                        const formattedValue = formatCellContent(cellValue, j, tabName);
                         html += `<td>${formattedValue}</td>`;
                     }
                     html += '</tr>';
@@ -736,87 +1252,150 @@
             table.innerHTML = html;
         }
 
-        // 应用筛选
-        function applyFilters() {
-            if (!currentData || currentData.length === 0) return;
+        // Apply filters for specific tab
+        function applyFilters(tabName) {
+            if (!currentData[tabName] || currentData[tabName].length === 0) return;
 
-            const processedFilter = document.getElementById('processedFilter').value;
-            const projectFilter = document.getElementById('projectFilter').value.toLowerCase();
-            const contactFilter = document.getElementById('contactFilter').value.toLowerCase();
-            const dateFilter = document.getElementById('dateFilter').value;
-
-            // 检测是否有表头行
-            const hasHeader = currentData[0] && currentData[0].join('').toLowerCase().includes('processed');
+            const data = currentData[tabName];
+            const hasHeader = data[0] && (
+                data[0].join('').toLowerCase().includes('processed') ||
+                data[0].join('').toLowerCase().includes('resume') ||
+                data[0].join('').toLowerCase().includes('match')
+            );
             const startIndex = hasHeader ? 1 : 0;
             
-            filteredData = hasHeader ? [currentData[0]] : []; // 如果有表头则保留
+            filteredData[tabName] = hasHeader ? [data[0]] : [];
 
-            for (let i = startIndex; i < currentData.length; i++) {
-                const row = currentData[i];
+            for (let i = startIndex; i < data.length; i++) {
+                const row = data[i];
                 let include = true;
 
-                // 处理状态筛选
-                if (processedFilter) {
-                    const processedStatus = (row[0] || '').toString();
-                    if (processedFilter === '已处理') {
-                        if (!processedStatus.includes('已') && !processedStatus.toLowerCase().includes('yes') && !processedStatus.toLowerCase().includes('completed')) {
-                            include = false;
+                if (tabName === 'case') {
+                    const processedFilter = document.getElementById('caseProcessedFilter').value;
+                    const projectFilter = document.getElementById('caseProjectFilter').value.toLowerCase();
+                    const contactFilter = document.getElementById('caseContactFilter').value.toLowerCase();
+                    const dateFilter = document.getElementById('caseDateFilter').value;
+
+                    if (processedFilter) {
+                        const processedStatus = (row[0] || '').toString();
+                        if (processedFilter === '已处理') {
+                            if (!processedStatus.includes('已') && !processedStatus.toLowerCase().includes('yes')) {
+                                include = false;
+                            }
+                        } else if (processedFilter === '未处理') {
+                            if (processedStatus.includes('已') || processedStatus.toLowerCase().includes('yes')) {
+                                include = false;
+                            }
                         }
-                    } else if (processedFilter === '未处理') {
-                        if (processedStatus.includes('已') || processedStatus.toLowerCase().includes('yes') || processedStatus.toLowerCase().includes('completed')) {
-                            include = false;
-                        }
                     }
-                }
 
-                // 项目ID筛选
-                if (projectFilter && include) {
-                    const projectId = (row[3] || '').toString().toLowerCase();
-                    if (!projectId.includes(projectFilter)) {
-                        include = false;
+                    if (projectFilter && include) {
+                        const projectId = (row[3] || '').toString().toLowerCase();
+                        if (!projectId.includes(projectFilter)) include = false;
                     }
-                }
 
-                // 联系人筛选
-                if (contactFilter && include) {
-                    const contactPerson = (row[8] || '').toString().toLowerCase();
-                    if (!contactPerson.includes(contactFilter)) {
-                        include = false;
+                    if (contactFilter && include) {
+                        const contactPerson = (row[8] || '').toString().toLowerCase();
+                        if (!contactPerson.includes(contactFilter)) include = false;
                     }
-                }
 
-                // 日期筛选
-                if (dateFilter && include) {
-                    const startTime = row[7] || '';
-                    if (startTime && !startTime.includes(dateFilter)) {
-                        include = false;
+                    if (dateFilter && include) {
+                        const startTime = row[7] || '';
+                        if (startTime && !startTime.includes(dateFilter)) include = false;
+                    }
+                } else if (tabName === 'talent') {
+                    const skillFilter = document.getElementById('talentSkillFilter').value.toLowerCase();
+                    const locationFilter = document.getElementById('talentLocationFilter').value.toLowerCase();
+                    const experienceFilter = document.getElementById('talentExperienceFilter').value;
+                    const nameFilter = document.getElementById('talentNameFilter').value.toLowerCase();
+
+                    if (skillFilter && include) {
+                        const skills = (row[6] || '').toString().toLowerCase();
+                        if (!skills.includes(skillFilter)) include = false;
+                    }
+
+                    if (locationFilter && include) {
+                        const location = (row[11] || '').toString().toLowerCase();
+                        if (!location.includes(locationFilter)) include = false;
+                    }
+
+                    if (experienceFilter && include) {
+                        const experience = parseInt(row[5]) || 0;
+                        if (experienceFilter === '0-2' && (experience < 0 || experience > 2)) include = false;
+                        else if (experienceFilter === '3-5' && (experience < 3 || experience > 5)) include = false;
+                        else if (experienceFilter === '6-10' && (experience < 6 || experience > 10)) include = false;
+                        else if (experienceFilter === '10+' && experience <= 10) include = false;
+                    }
+
+                    if (nameFilter && include) {
+                        const name = (row[3] || '').toString().toLowerCase();
+                        if (!name.includes(nameFilter)) include = false;
+                    }
+                } else if (tabName === 'matching') {
+                    const talentFilter = document.getElementById('matchingTalentFilter').value.toLowerCase();
+                    const queryFilter = document.getElementById('matchingQueryFilter').value.toLowerCase();
+                    const scoreFilter = parseInt(document.getElementById('matchingScoreFilter').value) || 0;
+                    const dateFilter = document.getElementById('matchingDateFilter').value;
+
+                    if (talentFilter && include) {
+                        const talentId = (row[1] || '').toString().toLowerCase();
+                        if (!talentId.includes(talentFilter)) include = false;
+                    }
+
+                    if (queryFilter && include) {
+                        const queryId = (row[3] || '').toString().toLowerCase();
+                        if (!queryId.includes(queryFilter)) include = false;
+                    }
+
+                    if (scoreFilter && include) {
+                        const score1 = parseFloat(row[5]) || 0;
+                        const score2 = parseFloat(row[8]) || 0;
+                        const score3 = parseFloat(row[11]) || 0;
+                        if (Math.max(score1, score2, score3) < scoreFilter) include = false;
+                    }
+
+                    if (dateFilter && include) {
+                        const matchDate = row[0] || '';
+                        if (matchDate && !matchDate.includes(dateFilter)) include = false;
                     }
                 }
 
                 if (include) {
-                    filteredData.push(row);
+                    filteredData[tabName].push(row);
                 }
             }
 
-            renderTable(filteredData);
-            generateStats(filteredData);
+            renderTable(tabName, filteredData[tabName]);
+            generateStats(tabName, filteredData[tabName]);
         }
 
-        // 清除筛选
-        function clearFilters() {
-            document.getElementById('processedFilter').value = '';
-            document.getElementById('projectFilter').value = '';
-            document.getElementById('contactFilter').value = '';
-            document.getElementById('dateFilter').value = '';
+        // Clear filters for specific tab
+        function clearFilters(tabName) {
+            if (tabName === 'case') {
+                document.getElementById('caseProcessedFilter').value = '';
+                document.getElementById('caseProjectFilter').value = '';
+                document.getElementById('caseContactFilter').value = '';
+                document.getElementById('caseDateFilter').value = '';
+            } else if (tabName === 'talent') {
+                document.getElementById('talentSkillFilter').value = '';
+                document.getElementById('talentLocationFilter').value = '';
+                document.getElementById('talentExperienceFilter').value = '';
+                document.getElementById('talentNameFilter').value = '';
+            } else if (tabName === 'matching') {
+                document.getElementById('matchingTalentFilter').value = '';
+                document.getElementById('matchingQueryFilter').value = '';
+                document.getElementById('matchingScoreFilter').value = '';
+                document.getElementById('matchingDateFilter').value = '';
+            }
             
-            filteredData = [...currentData];
-            renderTable(currentData);
-            generateStats(currentData);
+            filteredData[tabName] = [...currentData[tabName]];
+            renderTable(tabName, currentData[tabName]);
+            generateStats(tabName, currentData[tabName]);
         }
 
-        // 导出CSV
-        function exportToCSV() {
-            const dataToExport = filteredData.length > 0 ? filteredData : currentData;
+        // Export to CSV for specific tab
+        function exportToCSV(tabName) {
+            const dataToExport = filteredData[tabName].length > 0 ? filteredData[tabName] : currentData[tabName];
             
             if (!dataToExport || dataToExport.length === 0) {
                 alert('没有数据可以导出');
@@ -826,112 +1405,117 @@
             let csvContent = '';
             dataToExport.forEach(row => {
                 const csvRow = row.map(cell => {
-                    // 移除HTML标签并处理引号
                     const cleanCell = (cell || '').toString().replace(/<[^>]*>/g, '').replace(/"/g, '""');
                     return `"${cleanCell}"`;
                 }).join(',');
                 csvContent += csvRow + '\n';
             });
 
-            // 创建并下载文件
             const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `项目数据_${new Date().toISOString().split('T')[0]}.csv`;
+            link.download = `${tabName}_数据_${new Date().toISOString().split('T')[0]}.csv`;
             link.click();
         }
 
-        // 加载Google Sheets数据
-        async function loadData() {
+        // Load data for specific tab with automatic range detection
+        async function loadData(tabName) {
             const apiKey = document.getElementById('apiKey').value.trim();
             const sheetId = document.getElementById('sheetId').value.trim();
-            const sheetRange = document.getElementById('sheetRange').value.trim();
 
-            // 验证输入
-            if (!apiKey) {
-                showError('请输入Google API密钥');
+            if (!apiKey || !sheetId) {
+                showError(tabName, '请输入API密钥和表格ID');
                 return;
             }
 
-            if (!sheetId) {
-                showError('请输入Google Sheets表格ID');
-                return;
-            }
-
-            if (!sheetRange) {
-                showError('请输入数据范围');
-                return;
-            }
-
-            // 保存配置
-            saveConfig();
-
-            showLoading();
+            showLoading(tabName);
 
             try {
-                // 构建API URL
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetRange}?key=${apiKey}`;
+                // Auto-detect range for the specific sheet
+                const sheetRange = await detectSheetRange(apiKey, sheetId, sheetNames[tabName]);
+                await loadDataWithRange(tabName, apiKey, sheetId, sheetRange);
                 
-                // 发起请求
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-
-                if (!result.values || result.values.length === 0) {
-                    throw new Error('表格中没有找到数据，请检查数据范围设置');
-                }
-
-                currentData = result.values;
-                filteredData = [...currentData];
-                
-                // 生成统计信息
-                generateStats(currentData);
-                
-                // 渲染表格
-                renderTable(currentData);
-
-                // 显示数据容器
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('dataContainer').style.display = 'block';
-                
-                console.log('项目数据加载成功:', currentData);
-
             } catch (error) {
-                console.error('加载数据时出错:', error);
-                let errorMessage = '加载数据失败: ' + error.message;
+                console.error(`加载${tabName}数据时出错:`, error);
+                let errorMessage = `加载${tabName}数据失败: ` + error.message;
                 
                 if (error.message.includes('403')) {
                     errorMessage += '<br><br>可能的解决方案:<br>1. 检查API密钥是否正确<br>2. 确保已启用Google Sheets API<br>3. 检查API密钥的权限设置';
                 } else if (error.message.includes('400')) {
-                    errorMessage += '<br><br>可能的解决方案:<br>1. 检查表格ID是否正确<br>2. 检查数据范围格式是否正确<br>3. 确保表格是公开可访问的';
+                    errorMessage += '<br><br>可能的解决方案:<br>1. 检查表格ID是否正确<br>2. 确保表格是公开可访问的<br>3. 检查工作表名称是否正确';
                 } else if (error.message.includes('404')) {
                     errorMessage += '<br><br>表格未找到，请检查表格ID是否正确';
+                } else if (error.message.includes('未找到名为')) {
+                    errorMessage += `<br><br>请确保表格中包含名为 "${sheetNames[tabName]}" 的工作表`;
                 }
                 
-                showError(errorMessage);
+                showError(tabName, errorMessage);
             }
         }
 
-        // 页面加载时执行
+        // Load data with specific range
+        async function loadDataWithRange(tabName, apiKey, sheetId, sheetRange) {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetRange}?key=${apiKey}`;
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+
+            if (!result.values || result.values.length === 0) {
+                throw new Error(`工作表 "${sheetNames[tabName]}" 中没有找到数据`);
+            }
+
+            // Filter out completely empty rows
+            const filteredData = result.values.filter(row => 
+                row && row.some(cell => cell !== undefined && cell !== null && cell.toString().trim() !== '')
+            );
+
+            if (filteredData.length === 0) {
+                throw new Error(`工作表 "${sheetNames[tabName]}" 中没有找到有效数据`);
+            }
+
+            currentData[tabName] = filteredData;
+            filteredData[tabName] = [...filteredData];
+            
+            generateStats(tabName, filteredData);
+            renderTable(tabName, filteredData);
+
+            document.getElementById(tabName + 'Loading').style.display = 'none';
+            document.getElementById(tabName + 'DataContainer').style.display = 'block';
+            
+            console.log(`${tabName} 数据加载成功 (工作表: ${sheetNames[tabName]}):`, filteredData.length, '行数据');
+        }
+
+        // Page initialization
         document.addEventListener('DOMContentLoaded', function() {
             loadConfig();
             
-            // 添加回车键快捷加载
+            // Add keyboard shortcuts
             document.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    loadData();
+                if (e.key === 'Enter' && !isAuthenticated) {
+                    authenticateAndLoad();
                 }
             });
 
-            // 为筛选输入框添加回车事件
-            ['processedFilter', 'projectFilter', 'contactFilter', 'dateFilter'].forEach(id => {
-                document.getElementById(id).addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        applyFilters();
+            // Add filter enter key events for each tab
+            ['case', 'talent', 'matching'].forEach(tab => {
+                const filterIds = {
+                    case: ['caseProcessedFilter', 'caseProjectFilter', 'caseContactFilter', 'caseDateFilter'],
+                    talent: ['talentSkillFilter', 'talentLocationFilter', 'talentExperienceFilter', 'talentNameFilter'],
+                    matching: ['matchingTalentFilter', 'matchingQueryFilter', 'matchingScoreFilter', 'matchingDateFilter']
+                };
+                
+                filterIds[tab].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.addEventListener('keypress', function(e) {
+                            if (e.key === 'Enter') {
+                                applyFilters(tab);
+                            }
+                        });
                     }
                 });
             });
