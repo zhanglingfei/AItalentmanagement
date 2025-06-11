@@ -459,6 +459,144 @@
             background: #d97706;
         }
 
+        /* Pagination Styles */
+        .pagination-container {
+            background: #fffbeb;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #fbbf24;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #991b1b;
+            transform: translateY(-1px);
+        }
+
+        .pagination-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .pagination-btn.active {
+            background: #f59e0b;
+            color: #1f2937;
+        }
+
+        .pagination-btn.active:hover {
+            background: #d97706;
+        }
+
+        .pagination-first {
+            background: #374151;
+        }
+
+        .pagination-first:hover:not(:disabled) {
+            background: #1f2937;
+        }
+
+        .pagination-last {
+            background: #374151;
+        }
+
+        .pagination-last:hover:not(:disabled) {
+            background: #1f2937;
+        }
+
+        .page-input-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 2px solid #fbbf24;
+        }
+
+        .page-input-container label {
+            font-size: 12px;
+            color: #374151;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .page-input {
+            width: 50px;
+            padding: 4px 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .page-input:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        .page-size-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 2px solid #fbbf24;
+        }
+
+        .page-size-container label {
+            font-size: 12px;
+            color: #374151;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .page-size-select {
+            padding: 4px 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .page-size-select:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
         /* Talent database specific styles */
         .talent-id {
             font-family: 'Courier New', monospace;
@@ -645,6 +783,33 @@
                 <div class="table-container">
                     <table class="data-table" id="caseDataTable"></table>
                 </div>
+
+                <div class="pagination-container" id="casePagination" style="display: none;">
+                    <div class="pagination-info">
+                        <span id="casePaginationInfo">显示第 1-3 条，共 0 条记录</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <div class="page-size-container">
+                            <label>每页:</label>
+                            <select class="page-size-select" id="casePageSize" onchange="changePageSize('case')">
+                                <option value="3">3条</option>
+                                <option value="5">5条</option>
+                                <option value="10">10条</option>
+                                <option value="20">20条</option>
+                                <option value="50">50条</option>
+                            </select>
+                        </div>
+                        <button class="pagination-btn pagination-first" onclick="goToPage('case', 1)" id="caseFirstBtn">首页</button>
+                        <button class="pagination-btn" onclick="previousPage('case')" id="casePrevBtn">上一页</button>
+                        <div class="page-input-container">
+                            <label>第</label>
+                            <input type="number" class="page-input" id="casePageInput" min="1" onchange="goToPageInput('case')" onkeypress="handlePageInputEnter(event, 'case')">
+                            <label>页</label>
+                        </div>
+                        <button class="pagination-btn" onclick="nextPage('case')" id="caseNextBtn">下一页</button>
+                        <button class="pagination-btn pagination-last" onclick="goToLastPage('case')" id="caseLastBtn">末页</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -702,6 +867,33 @@
                 <div class="table-container">
                     <table class="data-table" id="talentDataTable"></table>
                 </div>
+
+                <div class="pagination-container" id="talentPagination" style="display: none;">
+                    <div class="pagination-info">
+                        <span id="talentPaginationInfo">显示第 1-3 条，共 0 条记录</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <div class="page-size-container">
+                            <label>每页:</label>
+                            <select class="page-size-select" id="talentPageSize" onchange="changePageSize('talent')">
+                                <option value="3">3条</option>
+                                <option value="5">5条</option>
+                                <option value="10">10条</option>
+                                <option value="20">20条</option>
+                                <option value="50">50条</option>
+                            </select>
+                        </div>
+                        <button class="pagination-btn pagination-first" onclick="goToPage('talent', 1)" id="talentFirstBtn">首页</button>
+                        <button class="pagination-btn" onclick="previousPage('talent')" id="talentPrevBtn">上一页</button>
+                        <div class="page-input-container">
+                            <label>第</label>
+                            <input type="number" class="page-input" id="talentPageInput" min="1" onchange="goToPageInput('talent')" onkeypress="handlePageInputEnter(event, 'talent')">
+                            <label>页</label>
+                        </div>
+                        <button class="pagination-btn" onclick="nextPage('talent')" id="talentNextBtn">下一页</button>
+                        <button class="pagination-btn pagination-last" onclick="goToLastPage('talent')" id="talentLastBtn">末页</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -753,6 +945,33 @@
                 <div class="table-container">
                     <table class="data-table" id="matchingDataTable"></table>
                 </div>
+
+                <div class="pagination-container" id="matchingPagination" style="display: none;">
+                    <div class="pagination-info">
+                        <span id="matchingPaginationInfo">显示第 1-3 条，共 0 条记录</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <div class="page-size-container">
+                            <label>每页:</label>
+                            <select class="page-size-select" id="matchingPageSize" onchange="changePageSize('matching')">
+                                <option value="3">3条</option>
+                                <option value="5">5条</option>
+                                <option value="10">10条</option>
+                                <option value="20">20条</option>
+                                <option value="50">50条</option>
+                            </select>
+                        </div>
+                        <button class="pagination-btn pagination-first" onclick="goToPage('matching', 1)" id="matchingFirstBtn">首页</button>
+                        <button class="pagination-btn" onclick="previousPage('matching')" id="matchingPrevBtn">上一页</button>
+                        <div class="page-input-container">
+                            <label>第</label>
+                            <input type="number" class="page-input" id="matchingPageInput" min="1" onchange="goToPageInput('matching')" onkeypress="handlePageInputEnter(event, 'matching')">
+                            <label>页</label>
+                        </div>
+                        <button class="pagination-btn" onclick="nextPage('matching')" id="matchingNextBtn">下一页</button>
+                        <button class="pagination-btn pagination-last" onclick="goToLastPage('matching')" id="matchingLastBtn">末页</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -768,6 +987,12 @@
             talent: [],
             matching: []
         };
+        let currentPage = {
+            case: 1,
+            talent: 1,
+            matching: 1
+        };
+        let recordsPerPage = 3;
         let isAuthenticated = false;
         
         // Column mappings for different tabs
@@ -922,6 +1147,10 @@
             // Load data if not already loaded
             if (currentData[tabName].length === 0) {
                 loadData(tabName);
+            } else {
+                // Reset pagination when switching tabs
+                currentPage[tabName] = 1;
+                renderTable(tabName, filteredData[tabName].length > 0 ? filteredData[tabName] : currentData[tabName]);
             }
         }
 
@@ -1209,14 +1438,32 @@
             return cellValue;
         }
 
-        // Render table for specific tab
+        // Render table for specific tab with pagination
         function renderTable(tabName, data) {
             const table = document.getElementById(tabName + 'DataTable');
             
             if (!data || data.length === 0) {
                 table.innerHTML = '<tr><td colspan="15">没有找到数据</td></tr>';
+                updatePagination(tabName, 0, []);
                 return;
             }
+
+            // Determine if first row is header
+            const hasHeader = data[0] && (
+                data[0].join('').toLowerCase().includes('processed') ||
+                data[0].join('').toLowerCase().includes('resume') ||
+                data[0].join('').toLowerCase().includes('match')
+            );
+            
+            const headerRow = hasHeader ? data[0] : null;
+            const dataRows = hasHeader ? data.slice(1) : data;
+            
+            // Apply pagination to data rows only
+            const currentPageNum = currentPage[tabName];
+            const pageSize = getPageSize(tabName);
+            const startIndex = (currentPageNum - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const paginatedData = dataRows.slice(startIndex, endIndex);
 
             let html = '';
             
@@ -1227,29 +1474,150 @@
             });
             html += '</tr></thead>';
 
-            // Create table body
+            // Create table body with paginated data
             html += '<tbody>';
-            const startIndex = data[0] && (
-                data[0].join('').toLowerCase().includes('processed') ||
-                data[0].join('').toLowerCase().includes('resume') ||
-                data[0].join('').toLowerCase().includes('match')
-            ) ? 1 : 0;
             
-            for (let i = startIndex; i < data.length; i++) {
-                if (data[i] && data[i].some(cell => cell !== undefined && cell !== '')) {
-                    html += '<tr>';
-                    const maxCols = predefinedHeaders[tabName].length;
-                    for (let j = 0; j < maxCols; j++) {
-                        const cellValue = data[i][j] || '';
-                        const formattedValue = formatCellContent(cellValue, j, tabName);
-                        html += `<td>${formattedValue}</td>`;
+            if (paginatedData.length === 0) {
+                const colspan = predefinedHeaders[tabName].length;
+                html += `<tr><td colspan="${colspan}" style="text-align: center; padding: 40px; color: #6b7280;">当前页没有数据</td></tr>`;
+            } else {
+                for (let i = 0; i < paginatedData.length; i++) {
+                    const row = paginatedData[i];
+                    if (row && row.some(cell => cell !== undefined && cell !== '')) {
+                        html += '<tr>';
+                        const maxCols = predefinedHeaders[tabName].length;
+                        for (let j = 0; j < maxCols; j++) {
+                            const cellValue = row[j] || '';
+                            const formattedValue = formatCellContent(cellValue, j, tabName);
+                            html += `<td>${formattedValue}</td>`;
+                        }
+                        html += '</tr>';
                     }
-                    html += '</tr>';
                 }
             }
             html += '</tbody>';
 
             table.innerHTML = html;
+            
+            // Update pagination controls
+            updatePagination(tabName, dataRows.length, dataRows);
+        }
+
+        // Get current page size for a tab
+        function getPageSize(tabName) {
+            const select = document.getElementById(tabName + 'PageSize');
+            return parseInt(select.value) || 3;
+        }
+
+        // Update pagination controls and info
+        function updatePagination(tabName, totalRecords, dataRows) {
+            const paginationContainer = document.getElementById(tabName + 'Pagination');
+            const paginationInfo = document.getElementById(tabName + 'PaginationInfo');
+            const pageInput = document.getElementById(tabName + 'PageInput');
+            
+            const pageSize = getPageSize(tabName);
+            const totalPages = Math.ceil(totalRecords / pageSize) || 1;
+            const currentPageNum = Math.min(currentPage[tabName], totalPages);
+            
+            // Update current page if it exceeds total pages
+            currentPage[tabName] = currentPageNum;
+            
+            const startRecord = totalRecords > 0 ? (currentPageNum - 1) * pageSize + 1 : 0;
+            const endRecord = Math.min(currentPageNum * pageSize, totalRecords);
+            
+            // Show pagination if there are records
+            if (totalRecords > 0) {
+                paginationContainer.style.display = 'flex';
+                paginationInfo.textContent = `显示第 ${startRecord}-${endRecord} 条，共 ${totalRecords} 条记录`;
+                pageInput.value = currentPageNum;
+                pageInput.max = totalPages;
+                
+                // Update button states
+                const firstBtn = document.getElementById(tabName + 'FirstBtn');
+                const prevBtn = document.getElementById(tabName + 'PrevBtn');
+                const nextBtn = document.getElementById(tabName + 'NextBtn');
+                const lastBtn = document.getElementById(tabName + 'LastBtn');
+                
+                firstBtn.disabled = currentPageNum === 1;
+                prevBtn.disabled = currentPageNum === 1;
+                nextBtn.disabled = currentPageNum === totalPages;
+                lastBtn.disabled = currentPageNum === totalPages;
+                
+            } else {
+                paginationContainer.style.display = 'none';
+            }
+        }
+
+        // Pagination functions
+        function goToPage(tabName, pageNum) {
+            const dataToUse = filteredData[tabName].length > 0 ? filteredData[tabName] : currentData[tabName];
+            const hasHeader = dataToUse[0] && (
+                dataToUse[0].join('').toLowerCase().includes('processed') ||
+                dataToUse[0].join('').toLowerCase().includes('resume') ||
+                dataToUse[0].join('').toLowerCase().includes('match')
+            );
+            const dataRows = hasHeader ? dataToUse.slice(1) : dataToUse;
+            const pageSize = getPageSize(tabName);
+            const totalPages = Math.ceil(dataRows.length / pageSize) || 1;
+            
+            currentPage[tabName] = Math.max(1, Math.min(pageNum, totalPages));
+            renderTable(tabName, dataToUse);
+        }
+
+        function previousPage(tabName) {
+            if (currentPage[tabName] > 1) {
+                goToPage(tabName, currentPage[tabName] - 1);
+            }
+        }
+
+        function nextPage(tabName) {
+            const dataToUse = filteredData[tabName].length > 0 ? filteredData[tabName] : currentData[tabName];
+            const hasHeader = dataToUse[0] && (
+                dataToUse[0].join('').toLowerCase().includes('processed') ||
+                dataToUse[0].join('').toLowerCase().includes('resume') ||
+                dataToUse[0].join('').toLowerCase().includes('match')
+            );
+            const dataRows = hasHeader ? dataToUse.slice(1) : dataToUse;
+            const pageSize = getPageSize(tabName);
+            const totalPages = Math.ceil(dataRows.length / pageSize) || 1;
+            
+            if (currentPage[tabName] < totalPages) {
+                goToPage(tabName, currentPage[tabName] + 1);
+            }
+        }
+
+        function goToLastPage(tabName) {
+            const dataToUse = filteredData[tabName].length > 0 ? filteredData[tabName] : currentData[tabName];
+            const hasHeader = dataToUse[0] && (
+                dataToUse[0].join('').toLowerCase().includes('processed') ||
+                dataToUse[0].join('').toLowerCase().includes('resume') ||
+                dataToUse[0].join('').toLowerCase().includes('match')
+            );
+            const dataRows = hasHeader ? dataToUse.slice(1) : dataToUse;
+            const pageSize = getPageSize(tabName);
+            const totalPages = Math.ceil(dataRows.length / pageSize) || 1;
+            
+            goToPage(tabName, totalPages);
+        }
+
+        function goToPageInput(tabName) {
+            const pageInput = document.getElementById(tabName + 'PageInput');
+            const pageNum = parseInt(pageInput.value);
+            if (pageNum && pageNum > 0) {
+                goToPage(tabName, pageNum);
+            }
+        }
+
+        function handlePageInputEnter(event, tabName) {
+            if (event.key === 'Enter') {
+                goToPageInput(tabName);
+            }
+        }
+
+        function changePageSize(tabName) {
+            currentPage[tabName] = 1; // Reset to first page when changing page size
+            const dataToUse = filteredData[tabName].length > 0 ? filteredData[tabName] : currentData[tabName];
+            renderTable(tabName, dataToUse);
         }
 
         // Apply filters for specific tab
@@ -1365,6 +1733,7 @@
                 }
             }
 
+            currentPage[tabName] = 1; // Reset to first page when applying filters
             renderTable(tabName, filteredData[tabName]);
             generateStats(tabName, filteredData[tabName]);
         }
@@ -1389,6 +1758,7 @@
             }
             
             filteredData[tabName] = [...currentData[tabName]];
+            currentPage[tabName] = 1; // Reset to first page when clearing filters
             renderTable(tabName, currentData[tabName]);
             generateStats(tabName, currentData[tabName]);
         }
