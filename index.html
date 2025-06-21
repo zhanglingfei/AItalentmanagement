@@ -944,10 +944,7 @@
                         <label for="matchingTalentFilter">人才ID:</label>
                         <input type="text" id="matchingTalentFilter" placeholder="搜索人才ID...">
                     </div>
-                    <div class="filter-group">
-                        <label for="matchingQueryFilter">查询ID:</label>
-                        <input type="text" id="matchingQueryFilter" placeholder="搜索查询ID...">
-                    </div>
+                
                     <div class="filter-group">
                         <label for="matchingScoreFilter">最低匹配分数:</label>
                         <input type="number" id="matchingScoreFilter" placeholder="例如: 80" min="0" max="100">
@@ -1060,17 +1057,16 @@
                 'Match_Date': 0,
                 'Talent_ID': 1,
                 'Talent_Name': 2,
-                'Query_ID': 3,
-                'Match 1 ID': 4,
-                'Match 1 Score': 5,
-                'Match 1 Name': 6,
-                'Match 2 ID': 7,
-                'Match 2 Score': 8,
-                'Match 2 Name': 9,
-                'Match 3 ID': 10,
-                'Match 3 Score': 11,
-                'Match 3 Name': 12,
-                'Match Details': 13
+                'Match 1 ID': 3,
+                'Match 1 Score': 4,
+                'Match 1 Name': 5,
+                'Match 2 ID': 6,
+                'Match 2 Score': 7,
+                'Match 2 Name': 8,
+                'Match 3 ID': 9,
+                'Match 3 Score': 10,
+                'Match 3 Name': 11,
+                'Match Details': 12
             }
         };
 
@@ -1087,7 +1083,7 @@
                 '主要项目', '首选工作地点', '语言能力', '联系邮箱', 'LinkedIn 或个人网站'
             ],
             matching: [
-                'Match_Date', 'Talent_ID', 'Talent_Name', 'Query_ID',
+                'Match_Date', 'Talent_ID', 'Talent_Name',
                 'Match 1 ID', 'Match 1 Score', 'Match 1 Name',
                 'Match 2 ID', 'Match 2 Score', 'Match 2 Name',
                 'Match 3 ID', 'Match 3 Score', 'Match 3 Name', 'Match Details'
@@ -1775,7 +1771,6 @@ function formatMatchDetails(jsonString) {
                     }
                 } else if (tabName === 'matching') {
                     const talentFilter = document.getElementById('matchingTalentFilter').value.toLowerCase();
-                    const queryFilter = document.getElementById('matchingQueryFilter').value.toLowerCase();
                     const scoreFilter = parseInt(document.getElementById('matchingScoreFilter').value) || 0;
                     const dateFilter = document.getElementById('matchingDateFilter').value;
 
@@ -1784,15 +1779,12 @@ function formatMatchDetails(jsonString) {
                         if (!talentId.includes(talentFilter)) include = false;
                     }
 
-                    if (queryFilter && include) {
-                        const queryId = (row[3] || '').toString().toLowerCase();
-                        if (!queryId.includes(queryFilter)) include = false;
-                    }
+
 
                     if (scoreFilter && include) {
-                        const score1 = parseFloat(row[5]) || 0;
-                        const score2 = parseFloat(row[8]) || 0;
-                        const score3 = parseFloat(row[11]) || 0;
+                        const score1 = parseFloat(row[4]) || 0;
+                        const score2 = parseFloat(row[7]) || 0;
+                        const score3 = parseFloat(row[10]) || 0;
                         if (Math.max(score1, score2, score3) < scoreFilter) include = false;
                     }
 
