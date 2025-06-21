@@ -1444,19 +1444,19 @@
                         return `<span class="timestamp">${cellValue}</span>`;
                     case 1: // Talent ID
                         return `<span class="talent-id">${cellValue}</span>`;
+                    case 3:
+                    case 6:
+                    case 9: // Match IDs
+                        return `<span class="project-id">${cellValue}</span>`;
                     case 4:
                     case 7:
-                    case 10: // Match IDs
-                        return `<span class="project-id">${cellValue}</span>`;
-                    case 5:
-                    case 8:
-                    case 11: // Match Scores
+                    case 10: // Match Scores
                         const score = parseFloat(cellValue) || 0;
                         let scoreClass = 'low';
                         if (score >= 80) scoreClass = 'high';
                         else if (score >= 60) scoreClass = 'medium';
                         return `<span class="match-score ${scoreClass}">${cellValue}</span>`;
-                    case 13: // Match Details - 解析JSON并格式化
+                    case 12: // Match Details
                         return formatMatchDetails(cellValue);
                 }
             }
