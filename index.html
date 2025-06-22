@@ -1480,9 +1480,9 @@
                 
                 for (let i = startIndex; i < data.length; i++) {
                     // 修正后的列索引 - 去掉了Match ID列
-                    const score1 = parseFloat(data[i][3]) || 0;  // Match 1 Score
-                    const score2 = parseFloat(data[i][5]) || 0;  // Match 2 Score
-                    const score3 = parseFloat(data[i][7]) || 0;  // Match 3 Score
+                    const score1 = parseFloat(data[i][4]) || 0;  // Match 1 Score
+                    const score2 = parseFloat(data[i][7]) || 0;  // Match 2 Score
+                    const score3 = parseFloat(data[i][10]) || 0;  // Match 3 Score
                     
                     [score1, score2, score3].forEach(score => {
                         if (score > 0) {
@@ -1596,15 +1596,15 @@
                 }
            } else if (tabName === 'matching') {
                 switch (columnIndex) {
-                    case 0: // Match Date
+                    case 0: // Match_Date
                         return `<span class="timestamp">${cellValue}</span>`;
-                    case 1: // Talent ID
+                    case 1: // Talent_ID
                         return `<span class="talent-id">${cellValue}</span>`;
-                    case 2: // Talent Name ← 添加这个
+                    case 2: // Talent_Name
                         return `<span class="project-title">${cellValue}</span>`;
                     case 3:
                     case 5:
-                    case 7: // Match Scores
+                    case 7: // Match 1/2/3 Score (重新映射后的索引)
                         const score = parseFloat(cellValue) || 0;
                         let scoreClass = 'low';
                         if (score >= 80) scoreClass = 'high';
@@ -1612,13 +1612,13 @@
                         return `<span class="match-score ${scoreClass}">${cellValue}</span>`;
                     case 4:
                     case 6:
-                    case 8: // Match Names ← 添加这些
+                    case 8: // Match 1/2/3 Name (重新映射后的索引)
                         return `<span class="project-title">${cellValue}</span>`;
-                    case 9: // Match Details
+                    case 9: // Match Details (重新映射后的索引)
                         return formatMatchDetails(cellValue);
                 }
             }
-            
+                        
             return cellValue;
         }
 
@@ -1667,69 +1667,81 @@ function formatMatchDetails(jsonString) {
 }
 
         // Render table for specific tab with pagination
-        function renderTable(tabName, data) {
-            const table = document.getElementById(tabName + 'DataTable');
+        // 在renderTable函数中，修改表格渲染部分
+            function renderTable(tabName, data) {
+                const table = document.getElementById(tabName + 'DataTable');
+                
+                if (!data || data.length === 0) {
+                    table.innerHTML = '<tr><td colspan="15">没有找到数据</td></tr>';
+                    updatePagination(tabName, 0, []);
+                    return;
+                }
             
-            if (!data || data.length === 0) {
-                table.innerHTML = '<tr><td colspan="15">没有找到数据</td></tr>';
-                updatePagination(tabName, 0, []);
-                return;
-            }
-
-            // Determine if first row is header
-            const hasHeader = data[0] && (
-                data[0].join('').toLowerCase().includes('processed') ||
-                data[0].join('').toLowerCase().includes('resume') ||
-                data[0].join('').toLowerCase().includes('match')
-            );
+                // 确定是否有表头
+                const hasHeader = data[0] && (
+                    data[0].join('').toLowerCase().includes('processed') ||
+                    data[0].join('').toLowerCase().includes('resume') ||
+                    data[0].join('').toLowerCase().includes('match')
+                );
+                
+                const headerRow = hasHeader ? data[0] : null;
+                const dataRows = hasHeader ? data.slice(1) : data;
+                
+                // 定义要隐藏的列索引（对于matching表）
+                const hiddenColumns = tabName === 'matching' ? [3, 6, 9] : []; // Match ID列
+                
+                // 应用分页
+                const currentPageNum = currentPage[tabName];
+                const pageSize = getPageSize(tabName);
+                const startIndex = (currentPageNum - 1) * pageSize;
+                const endIndex = startIndex + pageSize;
+                const paginatedData = dataRows.slice(startIndex, endIndex);
             
-            const headerRow = hasHeader ? data[0] : null;
-            const dataRows = hasHeader ? data.slice(1) : data;
+                let html = '';
+                
+                // 使用预定义的表头（已经去掉了Match ID）
+                html += '<thead><tr>';
+                predefinedHeaders[tabName].forEach((header) => {
+                    html += `<th>${header}</th>`;
+                });
+                html += '</tr></thead>';
             
-            // Apply pagination to data rows only
-            const currentPageNum = currentPage[tabName];
-            const pageSize = getPageSize(tabName);
-            const startIndex = (currentPageNum - 1) * pageSize;
-            const endIndex = startIndex + pageSize;
-            const paginatedData = dataRows.slice(startIndex, endIndex);
-
-            let html = '';
-            
-            // Use predefined headers
-            html += '<thead><tr>';
-            predefinedHeaders[tabName].forEach((header) => {
-                html += `<th>${header}</th>`;
-            });
-            html += '</tr></thead>';
-
-            // Create table body with paginated data
-            html += '<tbody>';
-            
-            if (paginatedData.length === 0) {
-                const colspan = predefinedHeaders[tabName].length;
-                html += `<tr><td colspan="${colspan}" style="text-align: center; padding: 40px; color: #6b7280;">当前页没有数据</td></tr>`;
-            } else {
-                for (let i = 0; i < paginatedData.length; i++) {
-                    const row = paginatedData[i];
-                    if (row && row.some(cell => cell !== undefined && cell !== '')) {
-                        html += '<tr>';
-                        const maxCols = predefinedHeaders[tabName].length;
-                        for (let j = 0; j < maxCols; j++) {
-                            const cellValue = row[j] || '';
-                            const formattedValue = formatCellContent(cellValue, j, tabName);
-                            html += `<td>${formattedValue}</td>`;
+                // 创建表格主体
+                html += '<tbody>';
+                
+                if (paginatedData.length === 0) {
+                    const colspan = predefinedHeaders[tabName].length;
+                    html += `<tr><td colspan="${colspan}" style="text-align: center; padding: 40px; color: #6b7280;">当前页没有数据</td></tr>`;
+                } else {
+                    for (let i = 0; i < paginatedData.length; i++) {
+                        const row = paginatedData[i];
+                        if (row && row.some(cell => cell !== undefined && cell !== '')) {
+                            html += '<tr>';
+                            
+                            // 过滤并重新映射列索引
+                            let displayColumnIndex = 0;
+                            for (let j = 0; j < row.length && displayColumnIndex < predefinedHeaders[tabName].length; j++) {
+                                // 跳过隐藏的列
+                                if (hiddenColumns.includes(j)) {
+                                    continue;
+                                }
+                                
+                                const cellValue = row[j] || '';
+                                const formattedValue = formatCellContent(cellValue, displayColumnIndex, tabName);
+                                html += `<td>${formattedValue}</td>`;
+                                displayColumnIndex++;
+                            }
+                            html += '</tr>';
                         }
-                        html += '</tr>';
                     }
                 }
-            }
-            html += '</tbody>';
-
-            table.innerHTML = html;
+                html += '</tbody>';
             
-            // Update pagination controls
-            updatePagination(tabName, dataRows.length, dataRows);
-        }
+                table.innerHTML = html;
+                
+                // 更新分页控件
+                updatePagination(tabName, dataRows.length, dataRows);
+            }
 
         // Get current page size for a tab
         function getPageSize(tabName) {
@@ -1939,9 +1951,9 @@ function formatMatchDetails(jsonString) {
                 
                     if (scoreFilter && include) {
                         // 修正后的列索引 - 去掉了Match ID列
-                        const score1 = parseFloat(row[3]) || 0;  // Match 1 Score
-                        const score2 = parseFloat(row[5]) || 0;  // Match 2 Score
-                        const score3 = parseFloat(row[7]) || 0;  // Match 3 Score
+                        const score1 = parseFloat(row[4]) || 0;  // Match 1 Score
+                        const score2 = parseFloat(row[7]) || 0;  // Match 2 Score
+                        const score3 = parseFloat(row[10]) || 0;  // Match 3 Score
                         if (Math.max(score1, score2, score3) < scoreFilter) include = false;
                     }
                 
