@@ -1662,20 +1662,22 @@ function formatMatchDetails(jsonString) {
             return '<div class="match-details-compact">📋 暂无匹配项目</div>';
         }
         
-        // 将匹配项目压缩为一段话
-        const matchSummary = data.matchedItems.slice(0, 3).map((match, index) => {
+        // ✅ 改进：包含reason的显示
+        let detailsHtml = '<div class="match-details-with-reason">';
+        detailsHtml += '<div>🎯 匹配项目:</div>';
+        
+        data.matchedItems.slice(0, 3).forEach((match, index) => {
             if (match.name && match.score) {
-                return `${match.name}(${match.score}分)`;
+                detailsHtml += `<div>• ${match.name} (${match.score}分)</div>`;
+                if (match.reason) {
+                    // ✅ 显示理由
+                    detailsHtml += `<div class="match-item-reason">💡 ${match.reason}</div>`;
+                }
             }
-            return null;
-        }).filter(item => item !== null);
+        });
         
-        if (matchSummary.length === 0) {
-            return '<div class="match-details-compact">📋 暂无有效匹配</div>';
-        }
-        
-        const summaryText = `🎯 匹配项目: ${matchSummary.join('、')}`;
-        return `<div class="match-details-compact" title="${summaryText}">${summaryText}</div>`;
+        detailsHtml += '</div>';
+        return detailsHtml;
         
     } catch (error) {
         console.error('JSON解析错误:', error);
