@@ -721,13 +721,145 @@
                 font-size: 12px;
             }
 
-            .data-table th, .data-table td {
-                padding: 8px 6px;
-                min-width: 100px;
+            /* 调整表格单元格的最小宽度以适应新字段 */
+            .data-table th,
+            .data-table td {
+                padding: 12px;
+                border-bottom: 1px solid #fde68a;
+                transition: background-color 0.2s ease;
+                font-size: 13px;
+                color: #1f2937;
+                vertical-align: top;
+                word-wrap: break-word;
+                white-space: pre-wrap;
+                line-height: 1.4;
+                min-width: 100px; /* 减小最小宽度以适应更多列 */
+                max-width: 300px; /* 减小最大宽度 */
+            }
+
+            /* 特定字段的宽度控制 */
+            .data-table th:nth-child(1),
+            .data-table td:nth-child(1) {
+                min-width: 120px; /* Processed At */
+            }
+            
+            .data-table th:nth-child(3),
+            .data-table td:nth-child(3) {
+                min-width: 200px; /* Email Subject */
+            }
+            
+            .data-table th:nth-child(4),
+            .data-table td:nth-child(4) {
+                min-width: 120px; /* Project ID */
+            }
+            
+            .data-table th:nth-child(5),
+            .data-table td:nth-child(5) {
+                min-width: 200px; /* Project Title */
+            }
+            
+            .data-table th:nth-child(6),
+            .data-table td:nth-child(6) {
+                min-width: 250px; /* Project Description */
+            }
+            
+            .data-table th:nth-child(11),
+            .data-table td:nth-child(11) {
+                min-width: 100px; /* Project Type */
+            }
+            
+            .data-table th:nth-child(12),
+            .data-table td:nth-child(12) {
+                min-width: 150px; /* Tech Requirements */
             }
 
             .table-container {
                 max-height: 500px;
+            }
+
+            /* 新增的项目字段样式 */
+            .project-type {
+                background: #f3e8ff;
+                color: #7c3aed;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 600;
+                display: inline-block;
+                word-break: break-word;
+            }
+            
+            .project-duration {
+                background: #fef3c7;
+                color: #92400e;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 600;
+                display: inline-block;
+                min-width: 80px;
+                text-align: center;
+            }
+            
+            .work-style {
+                background: #ecfdf5;
+                color: #065f46;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 500;
+                display: inline-block;
+            }
+            
+            .client-company {
+                background: #eff6ff;
+                color: #1e40af;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 600;
+                display: inline-block;
+                word-break: break-word;
+            }
+            
+            .urgency {
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: bold;
+                display: inline-block;
+                text-align: center;
+                min-width: 60px;
+            }
+            
+            .urgency.urgent {
+                background: #fee2e2;
+                color: #dc2626;
+                animation: pulse 2s infinite;
+            }
+            
+            .urgency.normal {
+                background: #f0f9ff;
+                color: #0284c7;
+            }
+            
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+            }
+            
+            .special-requirements {
+                min-width: 200px;
+                max-width: 300px;
+                word-break: break-word;
+                white-space: pre-wrap;
+                line-height: 1.4;
+                font-size: 13px;
+                color: #374151;
+                background: #fafafa;
+                padding: 6px;
+                border-radius: 4px;
+                border-left: 3px solid #f59e0b;
             }
         }
     </style>
