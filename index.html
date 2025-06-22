@@ -1479,9 +1479,10 @@
                 let validScores = 0;
                 
                 for (let i = startIndex; i < data.length; i++) {
-                    const score1 = parseFloat(data[i][5]) || 0;
-                    const score2 = parseFloat(data[i][8]) || 0;
-                    const score3 = parseFloat(data[i][11]) || 0;
+                    // 修正后的列索引 - 去掉了Match ID列
+                    const score1 = parseFloat(data[i][3]) || 0;  // Match 1 Score
+                    const score2 = parseFloat(data[i][5]) || 0;  // Match 2 Score
+                    const score3 = parseFloat(data[i][7]) || 0;  // Match 3 Score
                     
                     [score1, score2, score3].forEach(score => {
                         if (score > 0) {
@@ -1495,7 +1496,7 @@
                 }
                 
                 const avgScore = validScores > 0 ? (totalScore / validScores).toFixed(1) : 0;
-
+            
                 statsHTML = `
                     <div class="stat-card">
                         <div class="number">${totalItems}</div>
@@ -1593,25 +1594,21 @@
                         }
                         return cellValue;
                 }
-            } else if (tabName === 'matching') {
+           } else if (tabName === 'matching') {
                 switch (columnIndex) {
                     case 0: // Match Date
                         return `<span class="timestamp">${cellValue}</span>`;
                     case 1: // Talent ID
                         return `<span class="talent-id">${cellValue}</span>`;
                     case 3:
-                    case 6:
-                    case 9: // Match IDs
-                        return `<span class="project-id">${cellValue}</span>`;
-                    case 4:
-                    case 7:
-                    case 10: // Match Scores
+                    case 5:
+                    case 7: // Match Scores (修正后的列索引)
                         const score = parseFloat(cellValue) || 0;
                         let scoreClass = 'low';
                         if (score >= 80) scoreClass = 'high';
                         else if (score >= 60) scoreClass = 'medium';
                         return `<span class="match-score ${scoreClass}">${cellValue}</span>`;
-                    case 12: // Match Details
+                    case 9: // Match Details (修正后的列索引)
                         return formatMatchDetails(cellValue);
                 }
             }
@@ -1928,21 +1925,20 @@ function formatMatchDetails(jsonString) {
                     const talentFilter = document.getElementById('matchingTalentFilter').value.toLowerCase();
                     const scoreFilter = parseInt(document.getElementById('matchingScoreFilter').value) || 0;
                     const dateFilter = document.getElementById('matchingDateFilter').value;
-
+                
                     if (talentFilter && include) {
                         const talentId = (row[1] || '').toString().toLowerCase();
                         if (!talentId.includes(talentFilter)) include = false;
                     }
-
-
-
+                
                     if (scoreFilter && include) {
-                        const score1 = parseFloat(row[4]) || 0;
-                        const score2 = parseFloat(row[7]) || 0;
-                        const score3 = parseFloat(row[10]) || 0;
+                        // 修正后的列索引 - 去掉了Match ID列
+                        const score1 = parseFloat(row[3]) || 0;  // Match 1 Score
+                        const score2 = parseFloat(row[5]) || 0;  // Match 2 Score
+                        const score3 = parseFloat(row[7]) || 0;  // Match 3 Score
                         if (Math.max(score1, score2, score3) < scoreFilter) include = false;
                     }
-
+                
                     if (dateFilter && include) {
                         const matchDate = row[0] || '';
                         if (matchDate && !matchDate.includes(dateFilter)) include = false;
