@@ -1600,15 +1600,21 @@
                         return `<span class="timestamp">${cellValue}</span>`;
                     case 1: // Talent ID
                         return `<span class="talent-id">${cellValue}</span>`;
+                    case 2: // Talent Name ← 添加这个
+                        return `<span class="project-title">${cellValue}</span>`;
                     case 3:
                     case 5:
-                    case 7: // Match Scores (修正后的列索引)
+                    case 7: // Match Scores
                         const score = parseFloat(cellValue) || 0;
                         let scoreClass = 'low';
                         if (score >= 80) scoreClass = 'high';
                         else if (score >= 60) scoreClass = 'medium';
                         return `<span class="match-score ${scoreClass}">${cellValue}</span>`;
-                    case 9: // Match Details (修正后的列索引)
+                    case 4:
+                    case 6:
+                    case 8: // Match Names ← 添加这些
+                        return `<span class="project-title">${cellValue}</span>`;
+                    case 9: // Match Details
                         return formatMatchDetails(cellValue);
                 }
             }
