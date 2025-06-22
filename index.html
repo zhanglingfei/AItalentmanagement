@@ -1624,37 +1624,37 @@
 
 
         // 格式化匹配详情JSON为可读文本
-  function formatMatchDetails(jsonString) {
-    if (!jsonString || jsonString.trim() === '') {
-        return '<span class="match-details">无详细信息</span>';
-    }
-    
-    try {
-        const data = JSON.parse(jsonString);
-        let summary = '<div class="match-details-summary">';
-        
-        // 只显示匹配项目和理由
-        if (data.matchedItems && Array.isArray(data.matchedItems)) {
-            data.matchedItems.slice(0, 3).forEach((match, index) => {
-                if (match.name && match.score && match.reason) {
-                    summary += `<div class="match-item">
-                        • ${match.name} (${match.score}分)
-                        <br><small>${match.reason}</small>
-                    </div>`;
+          function formatMatchDetails(jsonString) {
+            if (!jsonString || jsonString.trim() === '') {
+                return '<span class="match-details">无详细信息</span>';
+            }
+            
+            try {
+                const data = JSON.parse(jsonString);
+                let summary = '<div class="match-details-summary">';
+                
+                // 只显示匹配项目和理由
+                if (data.matchedItems && Array.isArray(data.matchedItems)) {
+                    data.matchedItems.slice(0, 3).forEach((match, index) => {
+                        if (match.name && match.score && match.reason) {
+                            summary += `<div class="match-item">
+                                • ${match.name} (${match.score}分)
+                                <br><small>${match.reason}</small>
+                            </div>`;
+                        }
+                    });
                 }
-            });
+                
+                summary += '</div>';
+                return summary;
+                
+            } catch (error) {
+                console.error('JSON解析错误:', error);
+                const truncated = jsonString.length > 200 ? 
+                    jsonString.substring(0, 200) + '...' : jsonString;
+                return `<span class="match-details">解析失败: ${truncated}</span>`;
+            }
         }
-        
-        summary += '</div>';
-        return summary;
-        
-    } catch (error) {
-        console.error('JSON解析错误:', error);
-        const truncated = jsonString.length > 200 ? 
-            jsonString.substring(0, 200) + '...' : jsonString;
-        return `<span class="match-details">解析失败: ${truncated}</span>`;
-    }
-}
 
         // Render table for specific tab with pagination
         // 在renderTable函数中，修改表格渲染部分
