@@ -1624,7 +1624,7 @@
 
 
         // 格式化匹配详情JSON为可读文本
-function formatMatchDetails(jsonString) {
+  function formatMatchDetails(jsonString) {
     if (!jsonString || jsonString.trim() === '') {
         return '<span class="match-details">无详细信息</span>';
     }
@@ -1633,36 +1633,45 @@ function formatMatchDetails(jsonString) {
         const data = JSON.parse(jsonString);
         let summary = '<div class="match-details-summary">';
         
-        // 提取关键信息并格式化
-        if (data.query) {
-            summary += `<div class="detail-item"><strong>查询要求:</strong> ${data.query}</div>`;
+        // 使用正确的字段名
+        if (data.matchType) {
+            summary += `<div class="detail-item"><strong>匹配类型:</strong> ${data.matchType}
+                <span class="match-type-tag">${data.matchType}</span></div>`;
         }
         
-        if (data.matches && Array.isArray(data.matches)) {
-            summary += `<div class="detail-item"><strong>匹配候选人:</strong></div>`;
-            data.matches.slice(0, 3).forEach((match, index) => {
+        if (data.talentInfo) {
+            summary += `<div class="detail-item"><strong>人才信息:</strong></div>`;
+            summary += `<div class="talent-info">ID: ${data.talentInfo.id} | 
+                姓名: ${data.talentInfo.name} | 类型: ${data.talentInfo.type}</div>`;
+        }
+        
+        // 使用matchedItems而不是matches
+        if (data.matchedItems && Array.isArray(data.matchedItems)) {
+            summary += `<div class="detail-item"><strong>匹配项目 (${data.totalMatches}个):</strong></div>`;
+            data.matchedItems.slice(0, 3).forEach((match, index) => {
                 if (match.name && match.score) {
-                    summary += `<div class="match-item">• ${match.name} (${match.score}分)</div>`;
+                    summary += `<div class="match-item">
+                        • ${match.name} 
+                        <span class="score-badge">${match.score}分</span>
+                        <br><small>${match.reason}</small>
+                    </div>`;
                 }
             });
         }
         
-        if (data.criteria) {
-            summary += `<div class="detail-item"><strong>匹配标准:</strong> ${data.criteria}</div>`;
-        }
-        
-        if (data.notes) {
-            summary += `<div class="detail-item"><strong>备注:</strong> ${data.notes}</div>`;
+        if (data.searchDate) {
+            const date = new Date(data.searchDate).toLocaleString('zh-CN');
+            summary += `<div class="detail-item"><strong>搜索时间:</strong> ${date}</div>`;
         }
         
         summary += '</div>';
         return summary;
         
     } catch (error) {
-        // 如果不是有效JSON，返回截断的纯文本
+        console.error('JSON解析错误:', error);
         const truncated = jsonString.length > 200 ? 
             jsonString.substring(0, 200) + '...' : jsonString;
-        return `<span class="match-details">${truncated}</span>`;
+        return `<span class="match-details">解析失败: ${truncated}</span>`;
     }
 }
 
