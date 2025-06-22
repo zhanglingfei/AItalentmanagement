@@ -1034,7 +1034,14 @@
                 'Work Rate': 6,
                 'Start Time': 7,
                 'Contact Person': 8,
-                'Contact Information': 9
+                'Contact Information': 9,
+                'Project Type': 10,
+                'Tech Requirements': 11,
+                'Duration': 12,
+                'Work Style': 13,
+                'Client Company': 14,
+                'Urgency': 15,
+                'Special Requirements': 16
             },
             talent: {
                 '分析日期': 0,
@@ -1069,13 +1076,14 @@
                 'Match Details': 12
             }
         };
-
         // Predefined headers for each tab
         const predefinedHeaders = {
             case: [
                 'Processed At', 'Email Timestamp', 'Email Subject', 'Project ID',
                 'Project Title', 'Project Description', 'Work Rate', 'Start Time',
-                'Contact Person', 'Contact Information'
+                'Contact Person', 'Contact Information', 'Project Type',
+                'Tech Requirements', 'Duration', 'Work Style', 'Client Company',
+                'Urgency', 'Special Requirements'
             ],
             talent: [
                 '分析日期', 'PDF 文件名', 'Resume ID', '全名', '职业头衔',
@@ -1383,7 +1391,7 @@
             statsContainer.style.display = 'grid';
         }
 
-        // Format cell content based on tab and column
+        // 需要更新 formatCellContent 函数以处理新增的字段（移除原文内容处理）
         function formatCellContent(value, columnIndex, tabName) {
             if (!value) return '';
             
@@ -1414,6 +1422,24 @@
                     case 8:
                     case 9: // Contact info
                         return `<span class="contact-info">${cellValue}</span>`;
+                    case 10: // Project Type
+                        return `<span class="project-type">${cellValue}</span>`;
+                    case 11: // Tech Requirements
+                        const skills = cellValue.split(/[,，、]/).slice(0, 5);
+                        return `<div class="skill-tags">${skills.map(skill => 
+                            `<span class="skill-tag">${skill.trim()}</span>`
+                        ).join('')}</div>`;
+                    case 12: // Duration
+                        return `<span class="project-duration">${cellValue}</span>`;
+                    case 13: // Work Style
+                        return `<span class="work-style">${cellValue}</span>`;
+                    case 14: // Client Company
+                        return `<span class="client-company">${cellValue}</span>`;
+                    case 15: // Urgency
+                        const urgencyClass = cellValue.toLowerCase().includes('紧急') || cellValue.toLowerCase().includes('urgent') ? 'urgent' : 'normal';
+                        return `<span class="urgency ${urgencyClass}">${cellValue}</span>`;
+                    case 16: // Special Requirements
+                        return `<span class="special-requirements">${cellValue}</span>`;
                 }
             } else if (tabName === 'talent') {
                 switch (columnIndex) {
