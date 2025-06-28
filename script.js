@@ -246,6 +246,12 @@ const sheetNames = {
     matching: 'matches'
 };
 
+// Initialize page when loaded
+document.addEventListener('DOMContentLoaded', function() {
+    loadConfig();
+    console.log('页面已加载，配置已读取');
+});
+
 // Language switching functionality
 function switchLanguage(lang) {
     currentLanguage = lang;
@@ -362,6 +368,69 @@ async function detectSheetRange(apiKey, sheetId, sheetName) {
         console.error(`检测工作表范围时出错:`, error);
         // Fallback to default range
         return `${sheetName}!A1:Z1000`;
+    }
+}
+
+// Load data with specific range
+async function loadDataWithRange(tabName, apiKey, sheetId, range) {
+    try {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+        console.log(`正在从 ${range} 加载数据...`);
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP错误: ${response.status} - ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (!data.values || data.values.length === 0) {
+            throw new Error('未找到数据');
+        }
+
+        console.log(`成功加载 ${data.values.length} 行数据`);
+        
+        // Store the data
+        currentData[tabName] = data.values;
+        filteredData[tabName] = [];
+        currentPage[tabName] = 1;
+        
+        // Generate statistics and render table
+        generateStats(tabName, currentData[tabName]);
+        renderTable(tabName, currentData[tabName]);
+        
+        // Show data container
+        document.getElementById(tabName + 'Loading').style.display = 'none';
+        document.getElementById(tabName + 'DataContainer').style.display = 'block';
+        document.getElementById(tabName + 'Stats').style.display = 'grid';
+        hideError(tabName);
+        
+        return data.values;
+        
+    } catch (error) {
+        console.error(`加载${tabName}数据时出错:`, error);
+        throw error;
+    }
+}
+
+// Load data for a specific tab
+async function loadData(tabName) {
+    const apiKey = document.getElementById('apiKey').value.trim();
+    const sheetId = document.getElementById('sheetId').value.trim();
+
+    if (!apiKey || !sheetId) {
+        showError(tabName, '请先设置API密钥和表格ID');
+        return;
+    }
+
+    showLoading(tabName);
+
+    try {
+        const range = await detectSheetRange(apiKey, sheetId, sheetNames[tabName]);
+        await loadDataWithRange(tabName, apiKey, sheetId, range);
+    } catch (error) {
+        showError(tabName, `加载数据失败: ${error.message}`);
     }
 }
 
@@ -971,4 +1040,190 @@ function applyFilters(tabName) {
                 if (!projectId.includes(projectFilter)) include = false;
             }
 
-            if (contact
+            if (contactFilter && include) {
+                const contactPerson = (row[8] || '').toString().toLowerCase();
+                const contactInfo = (row[9] || '').toString().toLowerCase();
+                if (!contactPerson.includes(contactFilter) && !contactInfo.includes(contactFilter)) {
+                    include = false;
+                }
+            }
+
+            if (dateFilter && include) {
+                const emailTimestamp = (row[1] || '').toString();
+                const startTime = (row[7] || '').toString();
+                const filterDate = new Date(dateFilter);
+                
+                let rowDate = null;
+                if (emailTimestamp) {
+                    rowDate = new Date(emailTimestamp);
+                } else if (startTime) {
+                    rowDate = new Date(startTime);
+                }
+                
+                if (rowDate && !isNaN(rowDate.getTime())) {
+                    if (rowDate.toDateString() !== filterDate.toDateString()) {
+                        include = false;
+                    }
+                }
+            }
+
+        } else if (tabName === 'talent') {
+            const skillFilter = document.getElementById('talentSkillFilter').value.toLowerCase();
+            const locationFilter = document.getElementById('talentLocationFilter').value.toLowerCase();
+            const experienceFilter = document.getElementById('talentExperienceFilter').value;
+            const nameFilter = document.getElementById('talentNameFilter').value.toLowerCase();
+
+            if (skillFilter && include) {
+                const skills = (row[7] || '').toString().toLowerCase();
+                if (!skills.includes(skillFilter)) include = false;
+            }
+
+            if (locationFilter && include) {
+                const location = (row[15] || '').toString().toLowerCase();
+                if (!location.includes(locationFilter)) include = false;
+            }
+
+            if (experienceFilter && include) {
+                const experience = parseInt(row[6]) || 0;
+                
+                switch (experienceFilter) {
+                    case '0-2':
+                        if (experience > 2) include = false;
+                        break;
+                    case '3-5':
+                        if (experience < 3 || experience > 5) include = false;
+                        break;
+                    case '6-10':
+                        if (experience < 6 || experience > 10) include = false;
+                        break;
+                    case '10+':
+                        if (experience <= 10) include = false;
+                        break;
+                }
+            }
+
+            if (nameFilter && include) {
+                const name = (row[4] || '').toString().toLowerCase();
+                if (!name.includes(nameFilter)) include = false;
+            }
+
+        } else if (tabName === 'matching') {
+            const talentFilter = document.getElementById('matchingTalentFilter').value.toLowerCase();
+            const scoreFilter = parseFloat(document.getElementById('matchingScoreFilter').value) || 0;
+            const dateFilter = document.getElementById('matchingDateFilter').value;
+
+            if (talentFilter && include) {
+                const talentId = (row[1] || '').toString().toLowerCase();
+                const talentName = (row[2] || '').toString().toLowerCase();
+                if (!talentId.includes(talentFilter) && !talentName.includes(talentFilter)) {
+                    include = false;
+                }
+            }
+
+            if (scoreFilter && include) {
+                const score1 = parseFloat(row[4]) || 0;
+                const score2 = parseFloat(row[7]) || 0;
+                const score3 = parseFloat(row[10]) || 0;
+                const maxScore = Math.max(score1, score2, score3);
+                
+                if (maxScore < scoreFilter) include = false;
+            }
+
+            if (dateFilter && include) {
+                const matchDate = (row[0] || '').toString();
+                const filterDate = new Date(dateFilter);
+                
+                if (matchDate) {
+                    const rowDate = new Date(matchDate);
+                    if (!isNaN(rowDate.getTime()) && rowDate.toDateString() !== filterDate.toDateString()) {
+                        include = false;
+                    }
+                }
+            }
+        }
+
+        if (include) {
+            filteredData[tabName].push(row);
+        }
+    }
+
+    // Reset to first page and update display
+    currentPage[tabName] = 1;
+    renderTable(tabName, filteredData[tabName]);
+    generateStats(tabName, filteredData[tabName]);
+}
+
+// Clear filters for specific tab
+function clearFilters(tabName) {
+    if (tabName === 'case') {
+        document.getElementById('caseProcessedFilter').value = '';
+        document.getElementById('caseProjectFilter').value = '';
+        document.getElementById('caseContactFilter').value = '';
+        document.getElementById('caseDateFilter').value = '';
+    } else if (tabName === 'talent') {
+        document.getElementById('talentSkillFilter').value = '';
+        document.getElementById('talentLocationFilter').value = '';
+        document.getElementById('talentExperienceFilter').value = '';
+        document.getElementById('talentNameFilter').value = '';
+    } else if (tabName === 'matching') {
+        document.getElementById('matchingTalentFilter').value = '';
+        document.getElementById('matchingScoreFilter').value = '';
+        document.getElementById('matchingDateFilter').value = '';
+    }
+
+    filteredData[tabName] = [];
+    currentPage[tabName] = 1;
+    renderTable(tabName, currentData[tabName]);
+    generateStats(tabName, currentData[tabName]);
+}
+
+// Export data to CSV
+function exportToCSV(tabName) {
+    const dataToExport = filteredData[tabName].length > 0 ? filteredData[tabName] : currentData[tabName];
+    
+    if (!dataToExport || dataToExport.length === 0) {
+        alert('没有数据可导出');
+        return;
+    }
+
+    let csvContent = '';
+    
+    // Add headers
+    csvContent += predefinedHeaders[tabName].join(',') + '\n';
+    
+    // Determine if original data has header row
+    const hasHeader = dataToExport[0] && (
+        dataToExport[0].join('').toLowerCase().includes('processed') ||
+        dataToExport[0].join('').toLowerCase().includes('resume') ||
+        dataToExport[0].join('').toLowerCase().includes('match')
+    );
+    const startIndex = hasHeader ? 1 : 0;
+    
+    // Add data rows
+    for (let i = startIndex; i < dataToExport.length; i++) {
+        const row = dataToExport[i];
+        const csvRow = row.map(cell => {
+            const cellValue = (cell || '').toString();
+            // Escape quotes and wrap in quotes if contains comma or quote
+            if (cellValue.includes(',') || cellValue.includes('"') || cellValue.includes('\n')) {
+                return '"' + cellValue.replace(/"/g, '""') + '"';
+            }
+            return cellValue;
+        }).join(',');
+        csvContent += csvRow + '\n';
+    }
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${tabName}_data_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
