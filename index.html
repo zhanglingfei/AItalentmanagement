@@ -9,37 +9,43 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 TERABOX AI人才案件匹配管理数据查看器</h1>
-            <p>项目进度追踪与工作记录管理系统</p>
+            <!-- Language Switch Buttons -->
+            <div class="language-switch">
+                <button class="lang-btn active" onclick="switchLanguage('zh')" id="langZh">中文</button>
+                <button class="lang-btn" onclick="switchLanguage('ja')" id="langJa">日本語</button>
+            </div>
+            
+            <h1 data-key="title">📊 TERABOX AI人才案件匹配管理数据查看器</h1>
+            <p data-key="subtitle">项目进度追踪与工作记录管理系统</p>
         </div>
 
         <!-- Configuration Section -->
         <div class="config-section" id="configSection">
             <div class="config-form">
                 <div class="form-group">
-                    <label for="apiKey">Google API 密钥:</label>
-                    <input type="text" id="apiKey" placeholder="输入您的Google Sheets API密钥">
+                    <label for="apiKey" data-key="apiKeyLabel">Google API 密钥:</label>
+                    <input type="text" id="apiKey" data-key="apiKeyPlaceholder" placeholder="输入您的Google Sheets API密钥">
                 </div>
                 <div class="form-group">
-                    <label for="sheetId">Google Sheets表格ID:</label>
-                    <input type="text" id="sheetId" placeholder="包含所有数据的Google Sheets表格ID">
+                    <label for="sheetId" data-key="sheetIdLabel">Google Sheets表格ID:</label>
+                    <input type="text" id="sheetId" data-key="sheetIdPlaceholder" placeholder="包含所有数据的Google Sheets表格ID">
                 </div>
-                <button class="load-btn" onclick="authenticateAndLoad()">🔄 认证并加载数据</button>
+                <button class="load-btn" onclick="authenticateAndLoad()" data-key="loadBtn">🔄 认证并加载数据</button>
             </div>
         </div>
 
         <!-- Tab Navigation -->
         <div class="tab-navigation" id="tabNavigation" style="display: none;">
-            <button class="tab-button active" onclick="switchTab('case')" id="caseTab">📋 案件数据库</button>
-            <button class="tab-button" onclick="switchTab('talent')" id="talentTab">👥 人才数据库</button>
-            <button class="tab-button" onclick="switchTab('matching')" id="matchingTab">🎯 匹配结果一览</button>
+            <button class="tab-button active" onclick="switchTab('case')" id="caseTab" data-key="caseTab">📋 案件数据库</button>
+            <button class="tab-button" onclick="switchTab('talent')" id="talentTab" data-key="talentTab">👥 人才数据库</button>
+            <button class="tab-button" onclick="switchTab('matching')" id="matchingTab" data-key="matchingTab">🎯 匹配结果一览</button>
         </div>
 
         <!-- Case Database Tab -->
         <div class="tab-content active" id="caseContent">
             <div id="caseLoading" class="loading" style="display: none;">
                 <div class="spinner"></div>
-                <p>正在加载案件数据...</p>
+                <p data-key="caseLoadingText">正在加载案件数据...</p>
             </div>
 
             <div id="caseError" class="error" style="display: none;"></div>
@@ -49,38 +55,38 @@
             <div id="caseDataContainer" style="display: none;">
                 <div id="caseFilters" class="filters">
                     <div class="filter-group">
-                        <label for="caseProcessedFilter">处理状态:</label>
+                        <label for="caseProcessedFilter" data-key="caseProcessedFilterLabel">处理状态:</label>
                         <select id="caseProcessedFilter">
-                            <option value="">全部</option>
-                            <option value="已处理">已处理</option>
-                            <option value="未处理">未处理</option>
+                            <option value="" data-key="allOption">全部</option>
+                            <option value="已处理" data-key="processedOption">已处理</option>
+                            <option value="未处理" data-key="unprocessedOption">未处理</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label for="caseProjectFilter">项目ID:</label>
-                        <input type="text" id="caseProjectFilter" placeholder="搜索项目ID...">
+                        <label for="caseProjectFilter" data-key="caseProjectFilterLabel">项目ID:</label>
+                        <input type="text" id="caseProjectFilter" data-key="caseProjectFilterPlaceholder" placeholder="搜索项目ID...">
                     </div>
                     <div class="filter-group">
-                        <label for="caseContactFilter">联系人:</label>
-                        <input type="text" id="caseContactFilter" placeholder="搜索联系人...">
+                        <label for="caseContactFilter" data-key="caseContactFilterLabel">联系人:</label>
+                        <input type="text" id="caseContactFilter" data-key="caseContactFilterPlaceholder" placeholder="搜索联系人...">
                     </div>
                     <div class="filter-group">
-                        <label for="caseDateFilter">日期范围:</label>
+                        <label for="caseDateFilter" data-key="caseDateFilterLabel">日期范围:</label>
                         <input type="date" id="caseDateFilter">
                     </div>
                     <div class="filter-group">
-                        <button class="filter-btn" onclick="applyFilters('case')">🔍 筛选</button>
+                        <button class="filter-btn" onclick="applyFilters('case')" data-key="filterBtn">🔍 筛选</button>
                     </div>
                     <div class="filter-group">
-                        <button class="clear-btn" onclick="clearFilters('case')">🔄 清除</button>
+                        <button class="clear-btn" onclick="clearFilters('case')" data-key="clearBtn">🔄 清除</button>
                     </div>
                 </div>
 
                 <div class="toolbar">
-                    <h3>📈 案件数据表格</h3>
+                    <h3 data-key="caseTableTitle">📈 案件数据表格</h3>
                     <div>
-                        <button class="export-btn" onclick="exportToCSV('case')">📥 导出CSV</button>
-                        <button class="refresh-btn" onclick="loadData('case')">🔄 刷新数据</button>
+                        <button class="export-btn" onclick="exportToCSV('case')" data-key="exportBtn">📥 导出CSV</button>
+                        <button class="refresh-btn" onclick="loadData('case')" data-key="refreshBtn">🔄 刷新数据</button>
                     </div>
                 </div>
 
@@ -90,11 +96,11 @@
 
                 <div class="pagination-container" id="casePagination" style="display: none;">
                     <div class="pagination-info">
-                        <span id="casePaginationInfo">显示第 1-3 条，共 0 条记录</span>
+                        <span id="casePaginationInfo" data-key="paginationInfo">显示第 1-3 条，共 0 条记录</span>
                     </div>
                     <div class="pagination-controls">
                         <div class="page-size-container">
-                            <label>每页:</label>
+                            <label data-key="perPageLabel">每页:</label>
                             <select class="page-size-select" id="casePageSize" onchange="changePageSize('case')">
                                 <option value="3">3条</option>
                                 <option value="5">5条</option>
@@ -103,15 +109,15 @@
                                 <option value="50">50条</option>
                             </select>
                         </div>
-                        <button class="pagination-btn pagination-first" onclick="goToPage('case', 1)" id="caseFirstBtn">首页</button>
-                        <button class="pagination-btn" onclick="previousPage('case')" id="casePrevBtn">上一页</button>
+                        <button class="pagination-btn pagination-first" onclick="goToPage('case', 1)" id="caseFirstBtn" data-key="firstPageBtn">首页</button>
+                        <button class="pagination-btn" onclick="previousPage('case')" id="casePrevBtn" data-key="prevPageBtn">上一页</button>
                         <div class="page-input-container">
-                            <label>第</label>
+                            <label data-key="pageLabel">第</label>
                             <input type="number" class="page-input" id="casePageInput" min="1" onchange="goToPageInput('case')" onkeypress="handlePageInputEnter(event, 'case')">
-                            <label>页</label>
+                            <label data-key="pageUnitLabel">页</label>
                         </div>
-                        <button class="pagination-btn" onclick="nextPage('case')" id="caseNextBtn">下一页</button>
-                        <button class="pagination-btn pagination-last" onclick="goToLastPage('case')" id="caseLastBtn">末页</button>
+                        <button class="pagination-btn" onclick="nextPage('case')" id="caseNextBtn" data-key="nextPageBtn">下一页</button>
+                        <button class="pagination-btn pagination-last" onclick="goToLastPage('case')" id="caseLastBtn" data-key="lastPageBtn">末页</button>
                     </div>
                 </div>
             </div>
@@ -121,7 +127,7 @@
         <div class="tab-content" id="talentContent">
             <div id="talentLoading" class="loading" style="display: none;">
                 <div class="spinner"></div>
-                <p>正在加载人才数据...</p>
+                <p data-key="talentLoadingText">正在加载人才数据...</p>
             </div>
 
             <div id="talentError" class="error" style="display: none;"></div>
@@ -131,40 +137,40 @@
             <div id="talentDataContainer" style="display: none;">
                 <div id="talentFilters" class="filters">
                     <div class="filter-group">
-                        <label for="talentSkillFilter">技术技能:</label>
-                        <input type="text" id="talentSkillFilter" placeholder="搜索技能...">
+                        <label for="talentSkillFilter" data-key="talentSkillFilterLabel">技术技能:</label>
+                        <input type="text" id="talentSkillFilter" data-key="talentSkillFilterPlaceholder" placeholder="搜索技能...">
                     </div>
                     <div class="filter-group">
-                        <label for="talentLocationFilter">工作地点:</label>
-                        <input type="text" id="talentLocationFilter" placeholder="搜索地点...">
+                        <label for="talentLocationFilter" data-key="talentLocationFilterLabel">工作地点:</label>
+                        <input type="text" id="talentLocationFilter" data-key="talentLocationFilterPlaceholder" placeholder="搜索地点...">
                     </div>
                     <div class="filter-group">
-                        <label for="talentExperienceFilter">经验年限:</label>
+                        <label for="talentExperienceFilter" data-key="talentExperienceFilterLabel">经验年限:</label>
                         <select id="talentExperienceFilter">
-                            <option value="">全部</option>
-                            <option value="0-2">0-2年</option>
-                            <option value="3-5">3-5年</option>
-                            <option value="6-10">6-10年</option>
-                            <option value="10+">10年以上</option>
+                            <option value="" data-key="allOption">全部</option>
+                            <option value="0-2" data-key="exp02Option">0-2年</option>
+                            <option value="3-5" data-key="exp35Option">3-5年</option>
+                            <option value="6-10" data-key="exp610Option">6-10年</option>
+                            <option value="10+" data-key="exp10PlusOption">10年以上</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label for="talentNameFilter">姓名:</label>
-                        <input type="text" id="talentNameFilter" placeholder="搜索姓名...">
+                        <label for="talentNameFilter" data-key="talentNameFilterLabel">姓名:</label>
+                        <input type="text" id="talentNameFilter" data-key="talentNameFilterPlaceholder" placeholder="搜索姓名...">
                     </div>
                     <div class="filter-group">
-                        <button class="filter-btn" onclick="applyFilters('talent')">🔍 筛选</button>
+                        <button class="filter-btn" onclick="applyFilters('talent')" data-key="filterBtn">🔍 筛选</button>
                     </div>
                     <div class="filter-group">
-                        <button class="clear-btn" onclick="clearFilters('talent')">🔄 清除</button>
+                        <button class="clear-btn" onclick="clearFilters('talent')" data-key="clearBtn">🔄 清除</button>
                     </div>
                 </div>
 
                 <div class="toolbar">
-                    <h3>👥 人才数据表格</h3>
+                    <h3 data-key="talentTableTitle">👥 人才数据表格</h3>
                     <div>
-                        <button class="export-btn" onclick="exportToCSV('talent')">📥 导出CSV</button>
-                        <button class="refresh-btn" onclick="loadData('talent')">🔄 刷新数据</button>
+                        <button class="export-btn" onclick="exportToCSV('talent')" data-key="exportBtn">📥 导出CSV</button>
+                        <button class="refresh-btn" onclick="loadData('talent')" data-key="refreshBtn">🔄 刷新数据</button>
                     </div>
                 </div>
 
@@ -174,11 +180,11 @@
 
                 <div class="pagination-container" id="talentPagination" style="display: none;">
                     <div class="pagination-info">
-                        <span id="talentPaginationInfo">显示第 1-3 条，共 0 条记录</span>
+                        <span id="talentPaginationInfo" data-key="paginationInfo">显示第 1-3 条，共 0 条记录</span>
                     </div>
                     <div class="pagination-controls">
                         <div class="page-size-container">
-                            <label>每页:</label>
+                            <label data-key="perPageLabel">每页:</label>
                             <select class="page-size-select" id="talentPageSize" onchange="changePageSize('talent')">
                                 <option value="3">3条</option>
                                 <option value="5">5条</option>
@@ -187,15 +193,15 @@
                                 <option value="50">50条</option>
                             </select>
                         </div>
-                        <button class="pagination-btn pagination-first" onclick="goToPage('talent', 1)" id="talentFirstBtn">首页</button>
-                        <button class="pagination-btn" onclick="previousPage('talent')" id="talentPrevBtn">上一页</button>
+                        <button class="pagination-btn pagination-first" onclick="goToPage('talent', 1)" id="talentFirstBtn" data-key="firstPageBtn">首页</button>
+                        <button class="pagination-btn" onclick="previousPage('talent')" id="talentPrevBtn" data-key="prevPageBtn">上一页</button>
                         <div class="page-input-container">
-                            <label>第</label>
+                            <label data-key="pageLabel">第</label>
                             <input type="number" class="page-input" id="talentPageInput" min="1" onchange="goToPageInput('talent')" onkeypress="handlePageInputEnter(event, 'talent')">
-                            <label>页</label>
+                            <label data-key="pageUnitLabel">页</label>
                         </div>
-                        <button class="pagination-btn" onclick="nextPage('talent')" id="talentNextBtn">下一页</button>
-                        <button class="pagination-btn pagination-last" onclick="goToLastPage('talent')" id="talentLastBtn">末页</button>
+                        <button class="pagination-btn" onclick="nextPage('talent')" id="talentNextBtn" data-key="nextPageBtn">下一页</button>
+                        <button class="pagination-btn pagination-last" onclick="goToLastPage('talent')" id="talentLastBtn" data-key="lastPageBtn">末页</button>
                     </div>
                 </div>
             </div>
@@ -205,7 +211,7 @@
         <div class="tab-content" id="matchingContent">
             <div id="matchingLoading" class="loading" style="display: none;">
                 <div class="spinner"></div>
-                <p>正在加载匹配结果...</p>
+                <p data-key="matchingLoadingText">正在加载匹配结果...</p>
             </div>
 
             <div id="matchingError" class="error" style="display: none;"></div>
@@ -215,31 +221,31 @@
             <div id="matchingDataContainer" style="display: none;">
                 <div id="matchingFilters" class="filters">
                     <div class="filter-group">
-                        <label for="matchingTalentFilter">人才ID:</label>
-                        <input type="text" id="matchingTalentFilter" placeholder="搜索人才ID...">
+                        <label for="matchingTalentFilter" data-key="matchingTalentFilterLabel">人才ID:</label>
+                        <input type="text" id="matchingTalentFilter" data-key="matchingTalentFilterPlaceholder" placeholder="搜索人才ID...">
                     </div>
                 
                     <div class="filter-group">
-                        <label for="matchingScoreFilter">最低匹配分数:</label>
-                        <input type="number" id="matchingScoreFilter" placeholder="例如: 80" min="0" max="100">
+                        <label for="matchingScoreFilter" data-key="matchingScoreFilterLabel">最低匹配分数:</label>
+                        <input type="number" id="matchingScoreFilter" data-key="matchingScoreFilterPlaceholder" placeholder="例如: 80" min="0" max="100">
                     </div>
                     <div class="filter-group">
-                        <label for="matchingDateFilter">匹配日期:</label>
+                        <label for="matchingDateFilter" data-key="matchingDateFilterLabel">匹配日期:</label>
                         <input type="date" id="matchingDateFilter">
                     </div>
                     <div class="filter-group">
-                        <button class="filter-btn" onclick="applyFilters('matching')">🔍 筛选</button>
+                        <button class="filter-btn" onclick="applyFilters('matching')" data-key="filterBtn">🔍 筛选</button>
                     </div>
                     <div class="filter-group">
-                        <button class="clear-btn" onclick="clearFilters('matching')">🔄 清除</button>
+                        <button class="clear-btn" onclick="clearFilters('matching')" data-key="clearBtn">🔄 清除</button>
                     </div>
                 </div>
 
                 <div class="toolbar">
-                    <h3>🎯 匹配结果表格</h3>
+                    <h3 data-key="matchingTableTitle">🎯 匹配结果表格</h3>
                     <div>
-                        <button class="export-btn" onclick="exportToCSV('matching')">📥 导出CSV</button>
-                        <button class="refresh-btn" onclick="loadData('matching')">🔄 刷新数据</button>
+                        <button class="export-btn" onclick="exportToCSV('matching')" data-key="exportBtn">📥 导出CSV</button>
+                        <button class="refresh-btn" onclick="loadData('matching')" data-key="refreshBtn">🔄 刷新数据</button>
                     </div>
                 </div>
 
@@ -249,11 +255,11 @@
 
                 <div class="pagination-container" id="matchingPagination" style="display: none;">
                     <div class="pagination-info">
-                        <span id="matchingPaginationInfo">显示第 1-3 条，共 0 条记录</span>
+                        <span id="matchingPaginationInfo" data-key="paginationInfo">显示第 1-3 条，共 0 条记录</span>
                     </div>
                     <div class="pagination-controls">
                         <div class="page-size-container">
-                            <label>每页:</label>
+                            <label data-key="perPageLabel">每页:</label>
                             <select class="page-size-select" id="matchingPageSize" onchange="changePageSize('matching')">
                                 <option value="3">3条</option>
                                 <option value="5">5条</option>
@@ -262,15 +268,15 @@
                                 <option value="50">50条</option>
                             </select>
                         </div>
-                        <button class="pagination-btn pagination-first" onclick="goToPage('matching', 1)" id="matchingFirstBtn">首页</button>
-                        <button class="pagination-btn" onclick="previousPage('matching')" id="matchingPrevBtn">上一页</button>
+                        <button class="pagination-btn pagination-first" onclick="goToPage('matching', 1)" id="matchingFirstBtn" data-key="firstPageBtn">首页</button>
+                        <button class="pagination-btn" onclick="previousPage('matching')" id="matchingPrevBtn" data-key="prevPageBtn">上一页</button>
                         <div class="page-input-container">
-                            <label>第</label>
+                            <label data-key="pageLabel">第</label>
                             <input type="number" class="page-input" id="matchingPageInput" min="1" onchange="goToPageInput('matching')" onkeypress="handlePageInputEnter(event, 'matching')">
-                            <label>页</label>
+                            <label data-key="pageUnitLabel">页</label>
                         </div>
-                        <button class="pagination-btn" onclick="nextPage('matching')" id="matchingNextBtn">下一页</button>
-                        <button class="pagination-btn pagination-last" onclick="goToLastPage('matching')" id="matchingLastBtn">末页</button>
+                        <button class="pagination-btn" onclick="nextPage('matching')" id="matchingNextBtn" data-key="nextPageBtn">下一页</button>
+                        <button class="pagination-btn pagination-last" onclick="goToLastPage('matching')" id="matchingLastBtn" data-key="lastPageBtn">末页</button>
                     </div>
                 </div>
             </div>

@@ -16,8 +16,147 @@ let currentPage = {
 };
 let recordsPerPage = 3;
 let isAuthenticated = false;
+let currentLanguage = 'zh';
 
-// Column mappings for different tabs
+// Language translations
+const translations = {
+    zh: {
+        title: "📊 TERABOX AI人才案件匹配管理数据查看器",
+        subtitle: "项目进度追踪与工作记录管理系统",
+        apiKeyLabel: "Google API 密钥:",
+        apiKeyPlaceholder: "输入您的Google Sheets API密钥",
+        sheetIdLabel: "Google Sheets表格ID:",
+        sheetIdPlaceholder: "包含所有数据的Google Sheets表格ID",
+        loadBtn: "🔄 认证并加载数据",
+        caseTab: "📋 案件数据库",
+        talentTab: "👥 人才数据库",
+        matchingTab: "🎯 匹配结果一览",
+        caseLoadingText: "正在加载案件数据...",
+        talentLoadingText: "正在加载人才数据...",
+        matchingLoadingText: "正在加载匹配结果...",
+        caseProcessedFilterLabel: "处理状态:",
+        caseProjectFilterLabel: "项目ID:",
+        caseContactFilterLabel: "联系人:",
+        caseDateFilterLabel: "日期范围:",
+        talentSkillFilterLabel: "技术技能:",
+        talentLocationFilterLabel: "工作地点:",
+        talentExperienceFilterLabel: "经验年限:",
+        talentNameFilterLabel: "姓名:",
+        matchingTalentFilterLabel: "人才ID:",
+        matchingScoreFilterLabel: "最低匹配分数:",
+        matchingDateFilterLabel: "匹配日期:",
+        allOption: "全部",
+        processedOption: "已处理",
+        unprocessedOption: "未处理",
+        exp02Option: "0-2年",
+        exp35Option: "3-5年",
+        exp610Option: "6-10年",
+        exp10PlusOption: "10年以上",
+        caseProjectFilterPlaceholder: "搜索项目ID...",
+        caseContactFilterPlaceholder: "搜索联系人...",
+        talentSkillFilterPlaceholder: "搜索技能...",
+        talentLocationFilterPlaceholder: "搜索地点...",
+        talentNameFilterPlaceholder: "搜索姓名...",
+        matchingTalentFilterPlaceholder: "搜索人才ID...",
+        matchingScoreFilterPlaceholder: "例如: 80",
+        filterBtn: "🔍 筛选",
+        clearBtn: "🔄 清除",
+        caseTableTitle: "📈 案件数据表格",
+        talentTableTitle: "👥 人才数据表格",
+        matchingTableTitle: "🎯 匹配结果表格",
+        exportBtn: "📥 导出CSV",
+        refreshBtn: "🔄 刷新数据",
+        paginationInfo: "显示第 {start}-{end} 条，共 {total} 条记录",
+        perPageLabel: "每页:",
+        pageLabel: "第",
+        pageUnitLabel: "页",
+        firstPageBtn: "首页",
+        prevPageBtn: "上一页",
+        nextPageBtn: "下一页",
+        lastPageBtn: "末页",
+        totalProjects: "总项目数",
+        processedProjects: "已处理项目",
+        completionRate: "完成率",
+        avgWorkRate: "平均工作费率",
+        totalTalents: "总人才数",
+        skillTypes: "技能种类",
+        seniorTalents: "资深人才 (10+年)",
+        juniorTalents: "新手人才 (0-2年)",
+        totalMatches: "总匹配记录",
+        highMatches: "高分匹配 (≥80)",
+        mediumMatches: "中等匹配 (60-79)",
+        avgMatchScore: "平均匹配分数"
+    },
+    ja: {
+        title: "📊 TERABOX AI人材案件マッチング管理データビューア",
+        subtitle: "プロジェクト進捗追跡と作業記録管理システム",
+        apiKeyLabel: "Google API キー:",
+        apiKeyPlaceholder: "Google Sheets APIキーを入力してください",
+        sheetIdLabel: "Google SheetsテーブルID:",
+        sheetIdPlaceholder: "すべてのデータを含むGoogle SheetsテーブルID",
+        loadBtn: "🔄 認証してデータを読み込む",
+        caseTab: "📋 案件データベース",
+        talentTab: "👥 人材データベース",
+        matchingTab: "🎯 マッチング結果一覧",
+        caseLoadingText: "案件データを読み込み中...",
+        talentLoadingText: "人材データを読み込み中...",
+        matchingLoadingText: "マッチング結果を読み込み中...",
+        caseProcessedFilterLabel: "処理状況:",
+        caseProjectFilterLabel: "プロジェクトID:",
+        caseContactFilterLabel: "連絡先:",
+        caseDateFilterLabel: "日付範囲:",
+        talentSkillFilterLabel: "技術スキル:",
+        talentLocationFilterLabel: "勤務地:",
+        talentExperienceFilterLabel: "経験年数:",
+        talentNameFilterLabel: "氏名:",
+        matchingTalentFilterLabel: "人材ID:",
+        matchingScoreFilterLabel: "最低マッチングスコア:",
+        matchingDateFilterLabel: "マッチング日:",
+        allOption: "すべて",
+        processedOption: "処理済み",
+        unprocessedOption: "未処理",
+        exp02Option: "0-2年",
+        exp35Option: "3-5年",
+        exp610Option: "6-10年",
+        exp10PlusOption: "10年以上",
+        caseProjectFilterPlaceholder: "プロジェクトIDを検索...",
+        caseContactFilterPlaceholder: "連絡先を検索...",
+        talentSkillFilterPlaceholder: "スキルを検索...",
+        talentLocationFilterPlaceholder: "場所を検索...",
+        talentNameFilterPlaceholder: "氏名を検索...",
+        matchingTalentFilterPlaceholder: "人材IDを検索...",
+        matchingScoreFilterPlaceholder: "例: 80",
+        filterBtn: "🔍 フィルター",
+        clearBtn: "🔄 クリア",
+        caseTableTitle: "📈 案件データテーブル",
+        talentTableTitle: "👥 人材データテーブル",
+        matchingTableTitle: "🎯 マッチング結果テーブル",
+        exportBtn: "📥 CSVエクスポート",
+        refreshBtn: "🔄 データを更新",
+        paginationInfo: "{start}-{end} 件を表示、全 {total} 件",
+        perPageLabel: "1ページあたり:",
+        pageLabel: "",
+        pageUnitLabel: "ページ目",
+        firstPageBtn: "最初",
+        prevPageBtn: "前へ",
+        nextPageBtn: "次へ",
+        lastPageBtn: "最後",
+        totalProjects: "総プロジェクト数",
+        processedProjects: "処理済みプロジェクト",
+        completionRate: "完了率",
+        avgWorkRate: "平均作業レート",
+        totalTalents: "総人材数",
+        skillTypes: "スキルの種類",
+        seniorTalents: "シニア人材 (10+年)",
+        juniorTalents: "ジュニア人材 (0-2年)",
+        totalMatches: "総マッチング記録",
+        highMatches: "高スコアマッチング (≥80)",
+        mediumMatches: "中スコアマッチング (60-79)",
+        avgMatchScore: "平均マッチングスコア"
+    }
+};
+
+// Updated column mappings for different tabs
 const columnMappings = {
     case: {
         'Processed At': 0,
@@ -40,36 +179,44 @@ const columnMappings = {
     },
     talent: {
         '分析日期': 0,
-        'PDF 文件名': 1,
-        'Resume ID': 2,
-        '全名': 3,
-        '职业头衔': 4,
-        '工作经验年限': 5,
-        '技术技能': 6,
-        '证书': 7,
-        '教育背景': 8,
-        '先前雇主': 9,
-        '主要项目': 10,
-        '首选工作地点': 11,
-        '语言能力': 12,
-        '联系邮箱': 13,
-        'LinkedIn 或个人网站': 14
+        '邮件接收时间': 1,
+        'PDF 文件名': 2,
+        'Resume ID': 3,
+        '候选人全名': 4,
+        '职业头衔': 5,
+        '工作经验年限': 6,
+        '技术技能': 7,
+        '证书': 8,
+        '教育背景': 9,
+        '先前雇主': 10,
+        '主要项目': 11,
+        '专业领域': 12,
+        '期望薪资(单价或单金)': 13,
+        '可开始时间': 14,
+        '工作地点偏好': 15,
+        '工作方式偏好': 16,
+        '语言能力': 17,
+        '联系方式': 18,
+        '自我介绍摘要': 19
     },
     matching: {
         'Match_Date': 0,
         'Talent_ID': 1,
         'Talent_Name': 2,
-        'Match 1 Score': 3,
-        'Match 1 Name': 4,
-        'Match 2 Score': 5,
-        'Match 2 Name': 6,
-        'Match 3 Score': 7,
-        'Match 3 Name': 8,
-        'Match Details': 9
+        'Match 1 ID': 3,
+        'Match 1 Score': 4,
+        'Match 1 Name': 5,
+        'Match 2 ID': 6,
+        'Match 2 Score': 7,
+        'Match 2 Name': 8,
+        'Match 3 ID': 9,
+        'Match 3 Score': 10,
+        'Match 3 Name': 11,
+        'Match Details': 12
     }
 };
 
-// Predefined headers for each tab
+// Updated predefined headers for each tab (display headers)
 const predefinedHeaders = {
     case: [
         'Processed At', 'Email Timestamp', 'Email Subject', 'Project ID',
@@ -79,9 +226,10 @@ const predefinedHeaders = {
         'Urgency', 'Special Requirements'
     ],
     talent: [
-        '分析日期', 'PDF 文件名', 'Resume ID', '全名', '职业头衔',
+        '分析日期', '邮件接收时间', 'PDF 文件名', 'Resume ID', '候选人全名', '职业头衔',
         '工作经验年限', '技术技能', '证书', '教育背景', '先前雇主',
-        '主要项目', '首选工作地点', '语言能力', '联系邮箱', 'LinkedIn 或个人网站'
+        '主要项目', '专业领域', '期望薪资(单价或单金)', '可开始时间', '工作地点偏好', 
+        '工作方式偏好', '语言能力', '联系方式', '自我介绍摘要'
     ],
     matching: [
         'Match_Date', 'Talent_ID', 'Talent_Name',
@@ -98,13 +246,77 @@ const sheetNames = {
     matching: 'matches'
 };
 
+// Language switching functionality
+function switchLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('preferredLanguage', lang);
+    
+    // Update button states
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('lang' + lang.charAt(0).toUpperCase() + lang.slice(1)).classList.add('active');
+    
+    // Update all translatable elements
+    updateLanguageContent();
+}
+
+function updateLanguageContent() {
+    const elements = document.querySelectorAll('[data-key]');
+    elements.forEach(element => {
+        const key = element.getAttribute('data-key');
+        if (translations[currentLanguage] && translations[currentLanguage][key]) {
+            if (element.tagName === 'INPUT' && element.type !== 'button') {
+                element.placeholder = translations[currentLanguage][key];
+            } else {
+                element.textContent = translations[currentLanguage][key];
+            }
+        }
+    });
+    
+    // Update pagination info if visible
+    ['case', 'talent', 'matching'].forEach(tabName => {
+        const paginationInfo = document.getElementById(tabName + 'PaginationInfo');
+        if (paginationInfo && paginationInfo.style.display !== 'none') {
+            updatePaginationLanguage(tabName);
+        }
+    });
+}
+
+function updatePaginationLanguage(tabName) {
+    const dataToUse = filteredData[tabName].length > 0 ? filteredData[tabName] : currentData[tabName];
+    if (dataToUse.length === 0) return;
+    
+    const hasHeader = dataToUse[0] && (
+        dataToUse[0].join('').toLowerCase().includes('processed') ||
+        dataToUse[0].join('').toLowerCase().includes('resume') ||
+        dataToUse[0].join('').toLowerCase().includes('match')
+    );
+    const dataRows = hasHeader ? dataToUse.slice(1) : dataToUse;
+    const totalRecords = dataRows.length;
+    const pageSize = getPageSize(tabName);
+    const currentPageNum = currentPage[tabName];
+    
+    const startRecord = totalRecords > 0 ? (currentPageNum - 1) * pageSize + 1 : 0;
+    const endRecord = Math.min(currentPageNum * pageSize, totalRecords);
+    
+    const paginationInfo = document.getElementById(tabName + 'PaginationInfo');
+    const template = translations[currentLanguage].paginationInfo;
+    paginationInfo.textContent = template
+        .replace('{start}', startRecord)
+        .replace('{end}', endRecord)
+        .replace('{total}', totalRecords);
+}
+
 // Load configuration from localStorage
 function loadConfig() {
     const apiKey = localStorage.getItem('projectMgmtApiKey');
     const sheetId = localStorage.getItem('projectMgmtSheetId');
+    const savedLanguage = localStorage.getItem('preferredLanguage') || 'zh';
 
     if (apiKey) document.getElementById('apiKey').value = apiKey;
     if (sheetId) document.getElementById('sheetId').value = sheetId;
+    
+    // Set saved language
+    switchLanguage(savedLanguage);
 }
 
 // Save configuration to localStorage
@@ -281,19 +493,19 @@ function generateStats(tabName, data) {
         statsHTML = `
             <div class="stat-card">
                 <div class="number">${totalItems}</div>
-                <div class="label">总项目数</div>
+                <div class="label">${translations[currentLanguage].totalProjects}</div>
             </div>
             <div class="stat-card">
                 <div class="number">${processedCount}</div>
-                <div class="label">已处理项目</div>
+                <div class="label">${translations[currentLanguage].processedProjects}</div>
             </div>
             <div class="stat-card">
                 <div class="number">${completionRate}%</div>
-                <div class="label">完成率</div>
+                <div class="label">${translations[currentLanguage].completionRate}</div>
             </div>
             <div class="stat-card">
                 <div class="number">¥${avgWorkRate}</div>
-                <div class="label">平均工作费率</div>
+                <div class="label">${translations[currentLanguage].avgWorkRate}</div>
             </div>
         `;
     } else if (tabName === 'talent') {
@@ -301,8 +513,8 @@ function generateStats(tabName, data) {
         let skillSet = new Set();
         
         for (let i = startIndex; i < data.length; i++) {
-            const experience = data[i][5] || '';
-            const skills = data[i][6] || '';
+            const experience = data[i][6] || '';
+            const skills = data[i][7] || '';
             
             const expNum = parseInt(experience) || 0;
             if (expNum <= 2) expCounts['0-2']++;
@@ -320,19 +532,19 @@ function generateStats(tabName, data) {
         statsHTML = `
             <div class="stat-card">
                 <div class="number">${totalItems}</div>
-                <div class="label">总人才数</div>
+                <div class="label">${translations[currentLanguage].totalTalents}</div>
             </div>
             <div class="stat-card">
                 <div class="number">${skillSet.size}</div>
-                <div class="label">技能种类</div>
+                <div class="label">${translations[currentLanguage].skillTypes}</div>
             </div>
             <div class="stat-card">
                 <div class="number">${expCounts['10+']}</div>
-                <div class="label">资深人才 (10+年)</div>
+                <div class="label">${translations[currentLanguage].seniorTalents}</div>
             </div>
             <div class="stat-card">
                 <div class="number">${expCounts['0-2']}</div>
-                <div class="label">新手人才 (0-2年)</div>
+                <div class="label">${translations[currentLanguage].juniorTalents}</div>
             </div>
         `;
     } else if (tabName === 'matching') {
@@ -343,10 +555,9 @@ function generateStats(tabName, data) {
         let validScores = 0;
         
         for (let i = startIndex; i < data.length; i++) {
-            // Updated column indices - removed Match ID column
             const score1 = parseFloat(data[i][4]) || 0;  // Match 1 Score
             const score2 = parseFloat(data[i][7]) || 0;  // Match 2 Score
-            const score3 = parseFloat(data[i][10]) || 0;  // Match 3 Score
+            const score3 = parseFloat(data[i][10]) || 0; // Match 3 Score
             
             [score1, score2, score3].forEach(score => {
                 if (score > 0) {
@@ -364,19 +575,19 @@ function generateStats(tabName, data) {
         statsHTML = `
             <div class="stat-card">
                 <div class="number">${totalItems}</div>
-                <div class="label">总匹配记录</div>
+                <div class="label">${translations[currentLanguage].totalMatches}</div>
             </div>
             <div class="stat-card">
                 <div class="number">${highMatches}</div>
-                <div class="label">高分匹配 (≥80)</div>
+                <div class="label">${translations[currentLanguage].highMatches}</div>
             </div>
             <div class="stat-card">
                 <div class="number">${mediumMatches}</div>
-                <div class="label">中等匹配 (60-79)</div>
+                <div class="label">${translations[currentLanguage].mediumMatches}</div>
             </div>
             <div class="stat-card">
                 <div class="number">${avgScore}</div>
-                <div class="label">平均匹配分数</div>
+                <div class="label">${translations[currentLanguage].avgMatchScore}</div>
             </div>
         `;
     }
@@ -437,26 +648,22 @@ function formatCellContent(value, columnIndex, tabName) {
         }
     } else if (tabName === 'talent') {
         switch (columnIndex) {
-            case 0: // Analysis Date
+            case 0:
+            case 1: // Analysis Date, Email Timestamp
                 return `<span class="timestamp">${cellValue}</span>`;
-            case 2: // Resume ID
+            case 3: // Resume ID
                 return `<span class="talent-id">${cellValue}</span>`;
-            case 3: // Full Name
+            case 4: // Full Name
                 return `<span class="project-title">${cellValue}</span>`;
-            case 5: // Experience Years
+            case 6: // Experience Years
                 return `<span class="experience-years">${cellValue}年</span>`;
-            case 6: // Skills
+            case 7: // Skills
                 const skills = cellValue.split(/[,，、]/).slice(0, 5);
                 return `<div class="skill-tags">${skills.map(skill => 
                     `<span class="skill-tag">${skill.trim()}</span>`
                 ).join('')}</div>`;
-            case 13: // Email
+            case 18: // Contact Info
                 return `<span class="email-cell">${cellValue}</span>`;
-            case 14: // LinkedIn
-                if (cellValue.startsWith('http')) {
-                    return `<a href="${cellValue}" target="_blank">${cellValue}</a>`;
-                }
-                return cellValue;
         }
    } else if (tabName === 'matching') {
         switch (columnIndex) {
@@ -468,7 +675,7 @@ function formatCellContent(value, columnIndex, tabName) {
                 return `<span class="project-title">${cellValue}</span>`;
             case 3:
             case 5:
-            case 7: // Match 1/2/3 Score (remapped indices)
+            case 7: // Match 1/2/3 Score
                 const score = parseFloat(cellValue) || 0;
                 let scoreClass = 'low';
                 if (score >= 80) scoreClass = 'high';
@@ -476,9 +683,9 @@ function formatCellContent(value, columnIndex, tabName) {
                 return `<span class="match-score ${scoreClass}">${cellValue}</span>`;
             case 4:
             case 6:
-            case 8: // Match 1/2/3 Name (remapped indices)
+            case 8: // Match 1/2/3 Name
                 return `<span class="project-title">${cellValue}</span>`;
-            case 9: // Match Details (remapped indices)
+            case 9: // Match Details
                 return formatMatchDetails(cellValue);
         }
     }
@@ -542,8 +749,8 @@ function renderTable(tabName, data) {
     const headerRow = hasHeader ? data[0] : null;
     const dataRows = hasHeader ? data.slice(1) : data;
     
-    // Define hidden column indices (for matching table)
-    const hiddenColumns = tabName === 'matching' ? [3, 6, 9] : []; // Match ID columns
+    // Define hidden column indices for matching table (Match ID columns)
+    const hiddenColumns = tabName === 'matching' ? [3, 6, 9] : []; 
     
     // Apply pagination
     const currentPageNum = currentPage[tabName];
@@ -554,7 +761,7 @@ function renderTable(tabName, data) {
 
     let html = '';
     
-    // Use predefined headers (already removed Match ID)
+    // Use predefined headers
     html += '<thead><tr>';
     predefinedHeaders[tabName].forEach((header) => {
         html += `<th>${header}</th>`;
@@ -623,7 +830,14 @@ function updatePagination(tabName, totalRecords, dataRows) {
     // Show pagination if there are records
     if (totalRecords > 0) {
         paginationContainer.style.display = 'flex';
-        paginationInfo.textContent = `显示第 ${startRecord}-${endRecord} 条，共 ${totalRecords} 条记录`;
+        
+        // Update pagination info with current language
+        const template = translations[currentLanguage].paginationInfo;
+        paginationInfo.textContent = template
+            .replace('{start}', startRecord)
+            .replace('{end}', endRecord)
+            .replace('{total}', totalRecords);
+            
         pageInput.value = currentPageNum;
         pageInput.max = totalPages;
         
@@ -757,225 +971,4 @@ function applyFilters(tabName) {
                 if (!projectId.includes(projectFilter)) include = false;
             }
 
-            if (contactFilter && include) {
-                const contactPerson = (row[8] || '').toString().toLowerCase();
-                if (!contactPerson.includes(contactFilter)) include = false;
-            }
-
-            if (dateFilter && include) {
-                const startTime = row[7] || '';
-                if (startTime && !startTime.includes(dateFilter)) include = false;
-            }
-        } else if (tabName === 'talent') {
-            const skillFilter = document.getElementById('talentSkillFilter').value.toLowerCase();
-            const locationFilter = document.getElementById('talentLocationFilter').value.toLowerCase();
-            const experienceFilter = document.getElementById('talentExperienceFilter').value;
-            const nameFilter = document.getElementById('talentNameFilter').value.toLowerCase();
-
-            if (skillFilter && include) {
-                const skills = (row[6] || '').toString().toLowerCase();
-                if (!skills.includes(skillFilter)) include = false;
-            }
-
-            if (locationFilter && include) {
-                const location = (row[11] || '').toString().toLowerCase();
-                if (!location.includes(locationFilter)) include = false;
-            }
-
-            if (experienceFilter && include) {
-                const experience = parseInt(row[5]) || 0;
-                if (experienceFilter === '0-2' && (experience < 0 || experience > 2)) include = false;
-                else if (experienceFilter === '3-5' && (experience < 3 || experience > 5)) include = false;
-                else if (experienceFilter === '6-10' && (experience < 6 || experience > 10)) include = false;
-                else if (experienceFilter === '10+' && experience <= 10) include = false;
-            }
-
-            if (nameFilter && include) {
-                const name = (row[3] || '').toString().toLowerCase();
-                if (!name.includes(nameFilter)) include = false;
-            }
-        } else if (tabName === 'matching') {
-            const talentFilter = document.getElementById('matchingTalentFilter').value.toLowerCase();
-            const scoreFilter = parseInt(document.getElementById('matchingScoreFilter').value) || 0;
-            const dateFilter = document.getElementById('matchingDateFilter').value;
-        
-            if (talentFilter && include) {
-                const talentId = (row[1] || '').toString().toLowerCase();
-                if (!talentId.includes(talentFilter)) include = false;
-            }
-        
-            if (scoreFilter && include) {
-                // Updated column indices - removed Match ID columns
-                const score1 = parseFloat(row[4]) || 0;  // Match 1 Score
-                const score2 = parseFloat(row[7]) || 0;  // Match 2 Score
-                const score3 = parseFloat(row[10]) || 0;  // Match 3 Score
-                if (Math.max(score1, score2, score3) < scoreFilter) include = false;
-            }
-        
-            if (dateFilter && include) {
-                const matchDate = row[0] || '';
-                if (matchDate && !matchDate.includes(dateFilter)) include = false;
-            }
-        }
-
-        if (include) {
-            filteredData[tabName].push(row);
-        }
-    }
-
-    currentPage[tabName] = 1; // Reset to first page when applying filters
-    renderTable(tabName, filteredData[tabName]);
-    generateStats(tabName, filteredData[tabName]);
-}
-
-// Clear filters for specific tab
-function clearFilters(tabName) {
-    if (tabName === 'case') {
-        document.getElementById('caseProcessedFilter').value = '';
-        document.getElementById('caseProjectFilter').value = '';
-        document.getElementById('caseContactFilter').value = '';
-        document.getElementById('caseDateFilter').value = '';
-    } else if (tabName === 'talent') {
-        document.getElementById('talentSkillFilter').value = '';
-        document.getElementById('talentLocationFilter').value = '';
-        document.getElementById('talentExperienceFilter').value = '';
-        document.getElementById('talentNameFilter').value = '';
-    } else if (tabName === 'matching') {
-        document.getElementById('matchingTalentFilter').value = '';
-        document.getElementById('matchingScoreFilter').value = '';
-        document.getElementById('matchingDateFilter').value = '';
-    }
-    
-    filteredData[tabName] = [...currentData[tabName]];
-    currentPage[tabName] = 1; // Reset to first page when clearing filters
-    renderTable(tabName, currentData[tabName]);
-    generateStats(tabName, currentData[tabName]);
-}
-
-// Export to CSV for specific tab
-function exportToCSV(tabName) {
-    const dataToExport = filteredData[tabName].length > 0 ? filteredData[tabName] : currentData[tabName];
-    
-    if (!dataToExport || dataToExport.length === 0) {
-        alert('没有数据可以导出');
-        return;
-    }
-
-    let csvContent = '';
-    dataToExport.forEach(row => {
-        const csvRow = row.map(cell => {
-            const cleanCell = (cell || '').toString().replace(/<[^>]*>/g, '').replace(/"/g, '""');
-            return `"${cleanCell}"`;
-        }).join(',');
-        csvContent += csvRow + '\n';
-    });
-
-    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${tabName}_数据_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-}
-
-// Load data for specific tab with automatic range detection
-async function loadData(tabName) {
-    const apiKey = document.getElementById('apiKey').value.trim();
-    const sheetId = document.getElementById('sheetId').value.trim();
-
-    if (!apiKey || !sheetId) {
-        showError(tabName, '请输入API密钥和表格ID');
-        return;
-    }
-
-    showLoading(tabName);
-
-    try {
-        // Auto-detect range for the specific sheet
-        const sheetRange = await detectSheetRange(apiKey, sheetId, sheetNames[tabName]);
-        await loadDataWithRange(tabName, apiKey, sheetId, sheetRange);
-        
-    } catch (error) {
-        console.error(`加载${tabName}数据时出错:`, error);
-        let errorMessage = `加载${tabName}数据失败: ` + error.message;
-        
-        if (error.message.includes('403')) {
-            errorMessage += '<br><br>可能的解决方案:<br>1. 检查API密钥是否正确<br>2. 确保已启用Google Sheets API<br>3. 检查API密钥的权限设置';
-        } else if (error.message.includes('400')) {
-            errorMessage += '<br><br>可能的解决方案:<br>1. 检查表格ID是否正确<br>2. 确保表格是公开可访问的<br>3. 检查工作表名称是否正确';
-        } else if (error.message.includes('404')) {
-            errorMessage += '<br><br>表格未找到，请检查表格ID是否正确';
-        } else if (error.message.includes('未找到名为')) {
-            errorMessage += `<br><br>请确保表格中包含名为 "${sheetNames[tabName]}" 的工作表`;
-        }
-        
-        showError(tabName, errorMessage);
-    }
-}
-
-// Load data with specific range
-async function loadDataWithRange(tabName, apiKey, sheetId, sheetRange) {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetRange}?key=${apiKey}`;
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-
-    if (!result.values || result.values.length === 0) {
-        throw new Error(`工作表 "${sheetNames[tabName]}" 中没有找到数据`);
-    }
-
-    // Filter out completely empty rows
-    const filteredData = result.values.filter(row => 
-        row && row.some(cell => cell !== undefined && cell !== null && cell.toString().trim() !== '')
-    );
-
-    if (filteredData.length === 0) {
-        throw new Error(`工作表 "${sheetNames[tabName]}" 中没有找到有效数据`);
-    }
-
-    currentData[tabName] = filteredData;
-    filteredData[tabName] = [...filteredData];
-    
-    generateStats(tabName, filteredData);
-    renderTable(tabName, filteredData);
-
-    document.getElementById(tabName + 'Loading').style.display = 'none';
-    document.getElementById(tabName + 'DataContainer').style.display = 'block';
-    
-    console.log(`${tabName} 数据加载成功 (工作表: ${sheetNames[tabName]}):`, filteredData.length, '行数据');
-}
-
-// Page initialization
-document.addEventListener('DOMContentLoaded', function() {
-    loadConfig();
-    
-    // Add keyboard shortcuts
-    document.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !isAuthenticated) {
-            authenticateAndLoad();
-        }
-    });
-
-    // Add filter enter key events for each tab
-    ['case', 'talent', 'matching'].forEach(tab => {
-        const filterIds = {
-            case: ['caseProcessedFilter', 'caseProjectFilter', 'caseContactFilter', 'caseDateFilter'],
-            talent: ['talentSkillFilter', 'talentLocationFilter', 'talentExperienceFilter', 'talentNameFilter'],
-            matching: ['matchingTalentFilter', 'matchingScoreFilter', 'matchingDateFilter']
-        };
-        
-        filterIds[tab].forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        applyFilters(tab);
-                    }
-                });
-            }
-        });
-    });
-});
+            if (contact

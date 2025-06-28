@@ -784,6 +784,66 @@ body {
     border-left: 3px solid #f59e0b;
 }
 
+/* Language switching styles */
+.language-switch {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.lang-btn {
+    padding: 8px 16px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 60px;
+}
+
+.lang-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+.lang-btn.active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+.lang-btn.active:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+/* Header positioning adjustment for language buttons */
+.header {
+    position: relative;
+    padding-right: 140px; /* Make space for language buttons */
+}
+
+@media (max-width: 768px) {
+    .language-switch {
+        position: relative;
+        top: 0;
+        right: 0;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .header {
+        padding-right: 20px;
+    }
+}
+
 /* Mobile responsive design */
 @media (max-width: 768px) {
     .container {
