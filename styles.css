@@ -27,12 +27,54 @@ body {
     color: white;
     padding: 30px;
     text-align: center;
+    position: relative;
+    padding-right: 180px; /* Make space for language buttons */
 }
 
 .header h1 {
     font-size: 2.5em;
     margin-bottom: 10px;
     font-weight: 300;
+}
+
+/* Language switching styles */
+.language-switch {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.lang-btn {
+    padding: 8px 16px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 60px;
+}
+
+.lang-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+.lang-btn.active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+.lang-btn.active:hover {
+    background: #2563eb;
+    border-color: #2563eb;
 }
 
 /* Tab Navigation Styles */
@@ -699,6 +741,21 @@ body {
     color: #dc2626;
 }
 
+.match-details-with-reason {
+    max-width: 300px;
+    font-size: 12px;
+    line-height: 1.3;
+    color: #374151;
+}
+
+.match-item-reason {
+    font-size: 11px;
+    color: #6b7280;
+    font-style: italic;
+    margin-left: 10px;
+    margin-bottom: 4px;
+}
+
 /* Additional project field styles */
 .project-type {
     background: #f3e8ff;
@@ -784,66 +841,6 @@ body {
     border-left: 3px solid #f59e0b;
 }
 
-/* Language switching styles */
-.language-switch {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    gap: 8px;
-    z-index: 1000;
-}
-
-.lang-btn {
-    padding: 8px 16px;
-    border: 2px solid #e5e7eb;
-    background: white;
-    color: #6b7280;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    min-width: 60px;
-}
-
-.lang-btn:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-    color: #374151;
-}
-
-.lang-btn.active {
-    background: #3b82f6;
-    border-color: #3b82f6;
-    color: white;
-}
-
-.lang-btn.active:hover {
-    background: #2563eb;
-    border-color: #2563eb;
-}
-
-/* Header positioning adjustment for language buttons */
-.header {
-    position: relative;
-    padding-right: 140px; /* Make space for language buttons */
-}
-
-@media (max-width: 768px) {
-    .language-switch {
-        position: relative;
-        top: 0;
-        right: 0;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
-    
-    .header {
-        padding-right: 20px;
-    }
-}
-
 /* Mobile responsive design */
 @media (max-width: 768px) {
     .container {
@@ -854,10 +851,19 @@ body {
 
     .header {
         padding: 20px;
+        padding-right: 20px; /* Reset right padding on mobile */
     }
 
     .header h1 {
         font-size: 1.8em;
+    }
+
+    .language-switch {
+        position: relative;
+        top: 0;
+        right: 0;
+        justify-content: center;
+        margin-bottom: 20px;
     }
 
     .tab-button {
@@ -880,52 +886,10 @@ body {
 
     .data-table th,
     .data-table td {
-        padding: 12px;
-        border-bottom: 1px solid #fde68a;
-        transition: background-color 0.2s ease;
-        font-size: 13px;
-        color: #1f2937;
-        vertical-align: top;
-        word-wrap: break-word;
-        white-space: pre-wrap;
-        line-height: 1.4;
+        padding: 8px;
+        font-size: 12px;
         min-width: 100px;
         max-width: 300px;
-    }
-
-    .data-table th:nth-child(1),
-    .data-table td:nth-child(1) {
-        min-width: 120px;
-    }
-    
-    .data-table th:nth-child(3),
-    .data-table td:nth-child(3) {
-        min-width: 200px;
-    }
-    
-    .data-table th:nth-child(4),
-    .data-table td:nth-child(4) {
-        min-width: 120px;
-    }
-    
-    .data-table th:nth-child(5),
-    .data-table td:nth-child(5) {
-        min-width: 200px;
-    }
-    
-    .data-table th:nth-child(6),
-    .data-table td:nth-child(6) {
-        min-width: 250px;
-    }
-    
-    .data-table th:nth-child(11),
-    .data-table td:nth-child(11) {
-        min-width: 100px;
-    }
-    
-    .data-table th:nth-child(12),
-    .data-table td:nth-child(12) {
-        min-width: 150px;
     }
 
     .table-container {
@@ -936,5 +900,26 @@ body {
         max-width: 200px;
         font-size: 11px;
         padding: 6px 8px;
+    }
+
+    .pagination-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .toolbar h3 {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .toolbar div {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
     }
 }
